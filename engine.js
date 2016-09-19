@@ -66,8 +66,12 @@ const open=function(id,opts,cb){
 				opening="";
 				if (err2) cb(err2);
 				else {
-					pool[id]=engine;
-					cb(0,engine);
+					if (engine&&engine.meta){
+						pool[id]=engine;
+						cb(0,engine);						
+					} else {
+						cb(id+" is invalid");
+					}
 				} 
 			});
 		}

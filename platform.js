@@ -9,7 +9,7 @@ var platform="browser";
 			platform="react-native-ios";
 		}
 	} catch (e) {
-		if (process&&process.versions&&process.versions.node) {
+		if (typeof process!=="undefined"&&process.versions&&process.versions.node) {
 			platform="node";
 		}
 	}
