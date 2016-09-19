@@ -24,13 +24,11 @@ const buildMap=function(){
 		throw "token map unpack error";
 	}
 	map=tokentypemap.split("");
+	Object.freeze(map);
 }
-const code2TokenType=function(code,ver){//now only have one version
-	if (!map.length) buildMap();	
-	return map[code];
+const getCode2TokenTypeMap=function(code,ver){//now only have one version
+	if (!map.length) buildMap();
+	return map;
 }
-const getTokenTypeMap=function(ver){
-	return code2TokenType;
-}
-const version=1;
-module.exports={TokenTypes,getTokenTypeMap,version}
+
+module.exports={TokenTypes,getCode2TokenTypeMap};

@@ -3,7 +3,7 @@
 */
 const JsonRom=require("ksana-jsonrom");
 const platform=require("./platform");
-const API=require("./api");
+const Corpus=require("./corpus");
 
 var opening="";
 var pool={};
@@ -21,20 +21,21 @@ const createEngine=function(kdb,opts,cb){//preload meta and other fields
 		cb=opts;
 		opts={};
 	}
-
 	var engine={kdb};
 
-	API.setup(engine);
+	engine.get=require("./get"); //install first API
 
 	if (kdb.fs.mergePostings) { //native mergePostings
 		engine.mergePostings=kdb.fs.mergePostings.bind(kdb.fs);
 	}
-	opts.preload=opts.preload||[];
+
+	opts.preload=opts.preload||[]; //user specified preload
 	var preload=[["meta"]];
 	opts.preload.forEach(function(p){preload.push(p)});
 
 	engine.get(preload,{recursive:true},function(res){
 		engine.meta=res[0];
+		Corpus.init(engine);
 		cb(0,engine);
 	});
 }
@@ -77,4 +78,5 @@ const open=function(id,opts,cb){
 		}
 	});
 }
+
 module.exports={open,close};
