@@ -1,6 +1,7 @@
 /* engine api */
 
 const setup=function(engine){
-	engine.get=require("./api-get"); //
+	engine.get=require("./api-get");
+
 }
-module.exports={setup}
+module.exports={setup};
