@@ -1,4 +1,5 @@
-const {getCode2TokenTypeMap,TokenTypes}=require("./tokentypes");
+const tt=require("./tokentypes");
+const TokenTypes=tt.TokenTypes;
 
 var parseIDS=function(str){ //return number of char used by one IDS
 	var count=0,i=0;
@@ -72,7 +73,7 @@ const tokenize=function(s){
 }
 
 const createTokenizer=function(version){
-	const code2TokenType=getCode2TokenTypeMap(version);
+	const code2TokenType=tt.getCode2TokenTypeMap(version);
 	return {tokenize, TokenTypes , version, code2TokenType};
 }
 

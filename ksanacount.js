@@ -2,7 +2,7 @@
 	given a string , return count
 */
 var {parseIDS}=require("./tokenizer");
-const classical_chinese=function(t){
+const cjk_nopunc=function(t){
 	var i=0,r=0;
 	while (i<t.length) {
 		var code=t.charCodeAt(i);
@@ -25,6 +25,24 @@ const classical_chinese=function(t){
 	}
 	return r;
 }
+var cjk_next=function(t){
+	var r=0,i=0;
+	while (!r){
+		code=t.charCodeAt(i);
+		if (code>=0xd800&&code<=0xdfff) {
+			r++;
+			i++;
+		} else if (code>=0x2ff0&&code<=0x2fff) {
+			var c=parseIDS(t.substr(i));
+			r++;
+			i+=c;
+		} else if (code>=0x3400 && code<=0x9fff) {
+			r++;
+		}
+		i++;		
+	}
+	return i;
+}
 var cjk=function(t){
 	var i=0,r=0;
 	while (i<t.length){
@@ -36,7 +54,7 @@ var cjk=function(t){
 			var c=parseIDS(t.substr(i));
 			r++;
 			i+=c;
-		} else if (code>32 && code!==0x3000 && code>=0x2e80) {
+		} else if (code>=0x3400 && code<=0x9fff) {
 			r++;
 		}
 		i++;
@@ -74,4 +92,16 @@ const getRawToken=function(obj){
 	obj.str=t.substr(i);
 	return t.substr(0,i);
 }*/
-module.exports={cjk,classical_chinese,parseIDS};
+const getCounter=function(language){
+	if (language==="classical_chinese") {
+		return cjk_nopunc;
+	}
+	return cjk;
+}
+const getNext=function(language) {
+	if (language==="classical_chinese") {
+		return cjk_next;
+	}
+	return cjk_next;	
+}
+module.exports={cjk,cjk_nopunc,parseIDS,getCounter,getNext};

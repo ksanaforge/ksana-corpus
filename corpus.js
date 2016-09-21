@@ -1,6 +1,6 @@
 const Ksanapos=require("./ksanapos");
 const Ksanacount=require("./ksanacount");
-const {createTokenizer}=require("./tokenizer");
+const createTokenizer=require("./tokenizer").createTokenizer;
 
 const getField=function(name,cb){
 	return this.get(["fields",name],{recursive:true},(data)=>cb&&cb(data));
@@ -26,36 +26,77 @@ const makeTextKeys=function(s,e,hascol){//without col
 	return keys;
 }
 
-const getPages=function(kRange,cb) {
-	const pat=this.addressPattern;
+const parseRange=function(kRange,pat){
 	if (typeof kRange=="string") {
 		kRange=Ksanapos.parse(kRange,pat);
 	}
+	const r=Ksanapos.breakKRange(kRange,pat);
+	
+	const startarr=Ksanapos.unpack(r.start,pat);
+	var endarr=Ksanapos.unpack(r.end,pat);
+	return {startarr,endarr,start:r.start,end:r.end};
+}
+const getPages=function(kRange,cb) {
+	const r=parseRange.call(this,kRange,this.addressPattern);
 
-	const {start,end}=Ksanapos.breakKRange(kRange,pat);
-	
-	const startarr=Ksanapos.unpack(start,pat);
-	var endarr=Ksanapos.unpack(end,pat);
-	
-	const keys=makeTextKeys(startarr,endarr,pat.columnbits)
+	const keys=makeTextKeys(r.startarr,r.endarr,this.addressPattern.columnbits)
 	
 	this.get(keys,{recursive:true},cb);
 }
-const getLines=function(){ //good for excerpt listing
-	//call getPages
-	//remove extra leading and tailing line	
+const trimRight=function(str,chcount) {
+	var c=chcount,dis=0,t,s=str;
+	while (c) {
+		t=this.knext(s);
+		s=s.substr(t);
+		dis+=t;
+		c--;
+	}
+	return str.substr(0,dis);
 }
-const getTexts=function(){ //for small piece of text
-	//call getLines
-	//remove leading and tailing char and join the lines
+const trimLeft=function(str,chcount) {
+	var c=chcount,dis=0,t,s=str;
+	while (c) {
+		t=this.knext(s);
+		s=s.substr(t);
+		dis+=t;
+		c--;
+	}
+	return str.substr(dis);
+}
+const getText=function(kRange,cb){ //good for excerpt listing
+	//call getPages
+	getPages.call(this,kRange,(pages)=>{
+		var out=[],i,pat=this.addressPattern;
+		const r=parseRange.call(this,kRange,this.addressPattern);
+		const startpage=r.startarr[1],endpage=r.endarr[1];
+		for (i=startpage;i<=endpage;i++){
+			var pg=pages[i-startpage];
+			if (i==endpage) {//trim following
+				pg.length=r.endarr[2]+1;
+				pg[pg.length-1]=trimRight.call(this,pg[pg.length-1],r.endarr[3]);
+			}
+			if (i==startpage) {
+				pg=pg.slice(r.startarr[2]);
+				pg[0]=trimLeft.call(this,pg[0],r.startarr[3]);
+			} else if (i!=endpage){ //fill up array to max page
+				while (pg.length<pat.maxline) pg.push("");
+			}
+			out=out.concat(pg);
+		}
+		cb(out);
+	});
+	//remove extra leading and tailing line	
 }
 //get a juan and break by p
 const init=function(engine){
-	engine.addressPattern=Ksanapos.buildAddressPattern(engine.meta.bits);
+	engine.addressPattern=Ksanapos.buildAddressPattern(engine.meta.bits,engine.meta.column);
 	engine.tokenizer=createTokenizer(engine.meta.versions.tokenizer);
 	engine.getField=getField;
 	engine.getFieldNames=getFieldNames;
 	engine.getPages=getPages;
+	engine.getText=getText;
+	engine.kcount=Ksanacount.getCounter(engine.meta.language);
+	engine.knext=Ksanacount.getNext(engine.meta.language);
 }
 
 module.exports={init};

@@ -1,19 +1,17 @@
-const buildAddressPattern=function(b){
-	const bookbits=b[0],pagebits=b[1],
-	columnbits=b[2],linebits=b[3], charbits=b[4];
-	if (charbits*2+linebits*2+columnbits*2+pagebits*2+bookbits>53) {
+const buildAddressPattern=function(b,column){
+	const bookbits=b[0],pagebits=b[1],linebits=b[2], charbits=b[3];
+	if (charbits*2+linebits*2+pagebits*2+bookbits>53) {
 		throw "address has more than 53 bits";
 	}
 	const maxchar=1<<(charbits);
 	const maxline=1<<(linebits);
-	const maxcolumn=(columnbits==0)?0:(1<<columnbits);
 	const maxpage=1<<(pagebits);
 	const maxbook=1<<(bookbits);
-	var rangebits=charbits+linebits+columnbits+pagebits;
+	var rangebits=charbits+linebits+pagebits;
 	const maxrange=1<<(rangebits);
-	const bits=[bookbits,pagebits,columnbits,linebits,charbits];
-	return {maxbook,maxpage,maxcolumn,maxline,maxchar,maxrange,bits,
-					bookbits,pagebits,columnbits,linebits,charbits,rangebits};
+	const bits=[bookbits,pagebits,linebits,charbits];
+	return {maxbook,maxpage,maxline,maxchar,maxrange,bits,
+					bookbits,pagebits,linebits,charbits,rangebits,column};
 }
 var checknums=function(nums,pat){
 	if (nums[4]>pat.maxchar) {
@@ -22,10 +20,6 @@ var checknums=function(nums,pat){
 	}
 	if (nums[3]>pat.maxpage) {
 		console.error(nums[3],"exceed maxpage",pat.maxpage)
-		return 0;
-	}
-	if (nums[2]>pat.maxcolumn) {
-		console.error(nums[2],"exceed maxcolumn",pat.maxcolumn)
 		return 0;
 	}
 	if (nums[1]>pat.maxpage) {
@@ -48,9 +42,8 @@ var makeKPos=function(nums,pat){
 	}
 	if(!checknums(nums,pat))return -1;
 
-	kpos=nums[4];       mul*=Math.pow(2,pat.charbits);
-	kpos+= nums[3]*mul; mul*=Math.pow(2,pat.linebits);
-	kpos+= nums[2]*mul; mul*=Math.pow(2,pat.columnbits);
+	kpos=nums[3];       mul*=Math.pow(2,pat.charbits);
+	kpos+= nums[2]*mul; mul*=Math.pow(2,pat.linebits);
 	kpos+= nums[1]*mul; mul*=Math.pow(2,pat.pagebits);
 	kpos+= nums[0]*mul;
 
@@ -77,27 +70,24 @@ const makeKRange=function(startkpos,endkpos,pat){
 var unpack=function(kpos,pat){
 	var ch=kpos%pat.maxchar;
 	var line=Math.floor((kpos/pat.maxchar)%pat.maxline);
-	var col=0;
-	if (pat.maxcolumn) {
-		col=Math.floor((kpos/ Math.pow(2,pat.charbits+pat.linebits)) %pat.maxcolumn);
-	}
-	var page=Math.floor((kpos/ Math.pow(2,pat.charbits+pat.linebits+pat.columnbits)) %pat.maxpage);
-	var vol=Math.floor((kpos/Math.pow(2,pat.charbits+pat.linebits+pat.columnbits+pat.pagebits))%pat.maxbook);
+	var page=Math.floor((kpos/ Math.pow(2,pat.charbits+pat.linebits)) %pat.maxpage);
+	var vol=Math.floor((kpos/Math.pow(2,pat.charbits+pat.linebits+pat.pagebits))%pat.maxbook);
 
-	var r=[vol,page,col,line,ch];
+	var r=[vol,page,line,ch];
 	return r;
 }
 const stringify=function(kpos,pat){
 	const parts=unpack(kpos,pat);
-	var s= (parts[0]+1)+'p'+(1+parts[1]);
-	if (pat.maxcolumn){
-		console.log(pat.maxcolumn)
-		s+=String.fromCharCode(parts[2]+0x61);
+	var s= (parts[0]+1)+'p';
+	if (pat.column){//for taisho
+		s+=Math.floor(parts[1]/pat.column)+1;	
+		s+=String.fromCharCode((parts[1]%pat.column)+0x61);
 	} else {
+		s+=(1+parts[1]);
 		s+='.';
 	}
-	s+=(parts[3]+1);
-	if (parts[4]) s='#'+(parts[4]+1);
+	s+=(parts[2]+1);
+	s+='#'+(parts[3]+1);
 	return s;
 }
 const regexAddress=/(\d+)p(\d+)([a-z\.])(\d+)/
@@ -106,12 +96,12 @@ const regexFollow2=/(\d+)/
 /* convert human readible address to an integer*/
 const parseLineChar=function(arr,linech){
 	var l=linech.length-2; //last two digit is ch
-	if (l<0) {
-		arr[3]=parseInt(linech,10);
-		arr[4]=0;
+	if (l<1) {
+		arr[2]=parseInt(linech,10)-1;
+		arr[3]=0;
 	} else {
-		arr[3]=parseInt(linech.substr(0,l),10)-1; 
-		arr[4]=parseInt(linech.substr(l),10)-1;
+		arr[2]=parseInt(linech.substr(0,l),10)-1; 
+		arr[3]=parseInt(linech.substr(l),10)-1;
 	}
 }
 const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
@@ -125,7 +115,9 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 		parseLineChar(arr,m[1]);
 	} else { //has page, col
 		arr[1]=parseInt(m[1],10)-1; 
-		arr[2]=(parseInt(m[2],36)-10)||0;
+		if (pat.column) {
+			arr[1]=arr[1]*pat.column+(parseInt(m[2],36)-10);
+		}
 		parseLineChar(arr,m[3]);
 	}
 
@@ -139,17 +131,20 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 const parse=function(address,pat){
 	var m=address.match(regexAddress);
 	if (!m) return null;
-	var arr=[0,0,0,0,0];//book,page,col,line,ch
+	var arr=[0,0,0,0];//book,page,col,line,ch
 	
 	arr[0]=parseInt(m[1],10)-1; 
-	arr[1]=parseInt(m[2],10)-1; 
-	arr[2]=(parseInt(m[3],36)-10)||0; 
+	arr[1]=parseInt(m[2],10)-1;
+	if (pat.column) {
+		arr[1]=arr[1]*pat.column+(parseInt(m[3],36)-10);
+	}
+	
 	parseLineChar(arr,m[4]);
 
 	var start=makeKPos(arr,pat);
 	var end;
 
-	const at=address.indexOf("+");
+	const at=address.indexOf("-");
 	if (at>-1) {
 		remain=address.substr(at+1);
 		end=parseRemain(remain,pat,arr);
