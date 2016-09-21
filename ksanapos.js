@@ -90,29 +90,37 @@ const stringify=function(kpos,pat){
 	s+='#'+(parts[3]+1);
 	return s;
 }
-const regexAddress=/(\d+)p(\d+)([a-z\.])(\d+)/
-const regexFollow1=/(\d+)([a-z\.])(\d+)/
-const regexFollow2=/(\d+)/
+
 /* convert human readible address to an integer*/
 const parseLineChar=function(arr,linech){
 	var l=linech.length-2; //last two digit is ch
-	if (l<1) {
-		arr[2]=parseInt(linech,10)-1;
-		arr[3]=0;
+	if (linech.length<3) {
+		arr[3]=parseInt(linech,10);//update ch only
 	} else {
-		arr[2]=parseInt(linech.substr(0,l),10)-1; 
-		arr[3]=parseInt(linech.substr(l),10)-1;
+		arr[2]=parseInt(linech.substr(0,2),10)-1;  //first two is line
+		arr[3]=parseInt(linech.substr(2,2),10); //ch is one or two byte
 	}
 }
+const regexFollow1=/(\d+)([a-z\.])(\d+)/
+const regexFollow2=/([a-z])(\d+)/
+const regexFollow3=/(\d+)/
 const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 	var m=remain.match(regexFollow1);
 	var start=makeKPos(arr,pat);
 
 	if (!m) {
-		m=remain.match(regexFollow2); //only have line and ch
-		if (!m) return start+1; 
-		var l=m[1].length-2; //last two digit is ch
-		parseLineChar(arr,m[1]);
+		m=remain.match(regexFollow2); // have column and line and ch
+		if (!m) {
+			m=remain.match(regexFollow3); //only have line and ch
+			if (!m) return start+1;
+
+			parseLineChar(arr,m[1]);
+		} else {
+			arr[1]=Math.floor(arr[1]/3);
+			arr[1]=arr[1]*pat.column+(parseInt(m[1],36)-10);
+
+			parseLineChar(arr,m[2]);			
+		}
 	} else { //has page, col
 		arr[1]=parseInt(m[1],10)-1; 
 		if (pat.column) {
@@ -128,6 +136,8 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 	}
 	return end;
 }
+const regexAddress=/(\d+)p(\d+)([a-z\.])(\d+)/
+
 const parse=function(address,pat){
 	var m=address.match(regexAddress);
 	if (!m) return null;

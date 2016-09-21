@@ -27,7 +27,8 @@ const cjk_nopunc=function(t){
 }
 var cjk_next=function(t){
 	var r=0,i=0;
-	while (!r){
+	if (!t)return 0;
+	while (!r && i<t.length){
 		code=t.charCodeAt(i);
 		if (code>=0xd800&&code<=0xdfff) {
 			r++;

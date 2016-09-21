@@ -44,13 +44,19 @@ const getPages=function(kRange,cb) {
 	this.get(keys,{recursive:true},cb);
 }
 const trimRight=function(str,chcount) {
+	if (!str)return;
 	var c=chcount,dis=0,t,s=str;
+
 	while (c) {
 		t=this.knext(s);
 		s=s.substr(t);
 		dis+=t;
 		c--;
 	}
+	while (s.charCodeAt(0)<0x3400||s.charCodeAt(0)>0xdfff){
+		s=s.substr(1);
+		dis++;
+	}	
 	return str.substr(0,dis);
 }
 const trimLeft=function(str,chcount) {
@@ -61,16 +67,24 @@ const trimLeft=function(str,chcount) {
 		dis+=t;
 		c--;
 	}
+	while (s.charCodeAt(0)<0x3400||s.charCodeAt(0)>0xdfff){
+		s=s.substr(1);
+		dis++;
+	}
 	return str.substr(dis);
 }
 const getText=function(kRange,cb){ //good for excerpt listing
 	//call getPages
+	if (typeof kRange==="object") {
+		return getTexts.call(this,kRange,cb);
+	}
+
 	getPages.call(this,kRange,(pages)=>{
 		var out=[],i,pat=this.addressPattern;
 		const r=parseRange.call(this,kRange,this.addressPattern);
 		const startpage=r.startarr[1],endpage=r.endarr[1];
 		for (i=startpage;i<=endpage;i++){
-			var pg=pages[i-startpage];
+			var pg=JSON.parse(JSON.stringify(pages[i-startpage]));
 			if (i==endpage) {//trim following
 				pg.length=r.endarr[2]+1;
 				pg[pg.length-1]=trimRight.call(this,pg[pg.length-1],r.endarr[3]);
@@ -87,6 +101,29 @@ const getText=function(kRange,cb){ //good for excerpt listing
 	});
 	//remove extra leading and tailing line	
 }
+
+
+const getTexts=function(kRanges,cb){
+	if (!kRanges || !kRanges.length) {
+		cb([]);
+		return;
+	}
+	var output=[];
+	var jobs=JSON.parse(JSON.stringify(kRanges));
+	const fire=function(kRange){
+		getText.call(this,kRange,(data)=>{
+			output.push(data);
+			if (jobs.length) {
+				fire.call(this,jobs.shift());			
+			} else {
+				cb(output);
+			}
+		});
+	}	
+	fire.call(this,jobs.shift());
+}
+
+
 //get a juan and break by p
 const init=function(engine){
 	engine.addressPattern=Ksanapos.buildAddressPattern(engine.meta.bits,engine.meta.column);
