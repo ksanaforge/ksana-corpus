@@ -10,7 +10,8 @@ const buildAddressPattern=function(b,column){
 	var rangebits=charbits+linebits+pagebits;
 	const maxrange=1<<(rangebits);
 	const bits=[bookbits,pagebits,linebits,charbits];
-	return {maxbook,maxpage,maxline,maxchar,maxrange,bits,
+	const kposbits=bookbits+pagebits+linebits+charbits;
+	return {maxbook,maxpage,maxline,maxchar,maxrange,bits,kposbits,
 					bookbits,pagebits,linebits,charbits,rangebits,column};
 }
 var checknums=function(nums,pat){
@@ -76,7 +77,7 @@ var unpack=function(kpos,pat){
 	var r=[vol,page,line,ch];
 	return r;
 }
-const stringify=function(kpos,pat){
+const stringifyKPos=function(kpos,pat){
 	const parts=unpack(kpos,pat);
 	var s= (parts[0]+1)+'p';
 	if (pat.column){//for taisho
@@ -86,9 +87,30 @@ const stringify=function(kpos,pat){
 		s+=(1+parts[1]);
 		s+='.';
 	}
-	s+=(parts[2]+1);
-	s+='#'+(parts[3]+1);
+	line='0'+(parts[2]+1);
+	s+=line.substr(line.length-2);
+	ch='0'+(parts[3]+1);
+	s+=ch.substr(ch.length-2);
 	return s;
+}
+//not valid if kpos_start==0
+const stringify=function(krange_kpos,pat){
+	if ((krange_kpos/Math.pow(2,pat.kposbits))>1) {
+		const r=breakKRange(krange_kpos,pat);
+		var e=stringifyKPos(r.end,pat);
+		var at=e.indexOf("p");
+		e=e.substr(at+1); //remove vol
+		const s=stringifyKPos(r.start,pat);
+		const sarr=unpack(r.start,pat), earr=unpack(r.end,pat);
+
+		if (sarr[1]!==earr[1])      return s+'-'+e;
+		else if (sarr[2]!==earr[2]) return s+'-'+e.substr(e.length-4);
+		else if (sarr[3]!==earr[3])	return s+'-'+e.substr(e.length-2);
+
+		return s;
+	} else {
+		return stringifyKPos(krange_kpos,pat);
+	}
 }
 
 /* convert human readible address to an integer*/

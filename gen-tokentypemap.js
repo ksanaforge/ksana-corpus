@@ -23,7 +23,6 @@ const ranges=[
 	[[0x61,0x7a],TokenTypes.LATIN,"latin small"],
 	[[0x1e00,0x1eff],TokenTypes.LATIN,"latin extented additional"],
 	[[0x100,0x17f],TokenTypes.LATIN,"latin extented"],
-	[[0x100,0x17f],TokenTypes.LATIN,"latin extented"],
 	[[0x3000],TokenTypes.SPACE,"full width space"],
 	[[0xF90,0xFFF],TokenTypes.TIBETAN,"tibetan"],
 	[[0x00,0x20],TokenTypes.SPACE,"space"],

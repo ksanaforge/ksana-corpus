@@ -2,6 +2,29 @@
 	given a string , return count
 */
 var {parseIDS}=require("./tokenizer");
+
+const isWestern=function(c){
+return (c>=0x41&&c<=0x5a) ||(c>=0x61&&c<=0x7a)
+			|| (c>=0x100&&c<=0x17f) ||(c>=0x1e00&&c<=0x1eff)
+}
+const pali=function(t) {
+	var i=0,r=0,c,wlen;
+	while (i<t.length) {
+		wlen=0;
+		c=t.charCodeAt(i);
+		while (i<t.length&&!isWestern(c)) {
+			i++;
+			c=t.charCodeAt(i);
+		}
+		while (i<t.length&&isWestern(c)) {
+			i++;
+			c=t.charCodeAt(i);
+			wlen++;
+		}
+		if (wlen) r++;
+	}
+	return r;
+}
 const cjk_nopunc=function(t){
 	var i=0,r=0;
 	while (i<t.length) {
@@ -96,6 +119,8 @@ const getRawToken=function(obj){
 const getCounter=function(language){
 	if (language==="classical_chinese") {
 		return cjk_nopunc;
+	} else if (language==="pali") {
+		return pali;
 	}
 	return cjk;
 }
