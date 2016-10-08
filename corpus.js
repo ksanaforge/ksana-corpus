@@ -4,11 +4,11 @@ const createTokenizer=require("./tokenizer").createTokenizer;
 const bsearch=require("./bsearch");
 
 const getField=function(name,cb){
-	return this.get(["fields",name],{recursive:true},(data)=>cb&&cb(data));
+	return this.get(["fields",name],{recursive:true},function(data){return cb&&cb(data)});
 }
 
 const getFieldNames=function(cb){
-	const r=this.get(["fields"],(data)=>cb(Object.keys(data)));
+	const r=this.get(["fields"],function(data){return cb(Object.keys(data))});
 	return r?Object.keys(r):[];
 }
 
@@ -106,9 +106,9 @@ const getText=function(kRange,cb){ //good for excerpt listing
 		return out;
 	}
 
-	var stockpages=getPages.call(this,kRange,(pages)=>{
+	var stockpages=getPages.call(this,kRange,function(pages){
 		trimpages.call(this,pages);
-	});
+	}.bind(this));
 	if (typeof stockpages!=="undefined"&&
 		typeof stockpages!=="string") return trimpages(stockpages);
 	//remove extra leading and tailing line	
@@ -166,14 +166,14 @@ const getTexts=function(kRanges,cb){
 	var output=[];
 	var jobs=JSON.parse(JSON.stringify(kRanges));
 	const fire=function(kRange){
-		getText.call(this,kRange,(data)=>{
+		getText.call(this,kRange,function(data){
 			output.push(data);
 			if (jobs.length) {
 				fire.call(this,jobs.shift());			
 			} else {
 				cb(output);
 			}
-		});
+		}.bind(this));
 	}	
 	fire.call(this,jobs.shift());
 }
