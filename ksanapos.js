@@ -51,11 +51,15 @@ var makeKPos=function(nums,pat){
 	return kpos;
 }
 const breakKRange=function(kRange,pat){
-	var r=Math.pow(2,pat.rangebits);
-	var dis=Math.floor(kRange%r);
-	start=Math.floor(kRange/r);
-	end=start+dis;
-	return {start,end};
+	if (isRange(kRange,pat)){
+		var r=Math.pow(2,pat.rangebits);
+		var dis=Math.floor(kRange%r);
+		start=Math.floor(kRange/r);
+		end=start+dis;		
+		return {start,end};
+	} else {
+		return {start:kRange,end:kRange};
+	}
 }
 const makeKRange=function(startkpos,endkpos,pat){
 	if (isNaN(startkpos)||isNaN(endkpos)) {
@@ -89,13 +93,16 @@ const stringifyKPos=function(kpos,pat){
 	}
 	line='0'+(parts[2]+1);
 	s+=line.substr(line.length-2);
-	ch='0'+(parts[3]+1);
+	ch='0'+(parts[3]);
 	s+=ch.substr(ch.length-2);
 	return s;
 }
 //not valid if kpos_start==0
+const isRange=function(k,pat){
+	return (k/Math.pow(2,pat.kposbits))>1;
+}
 const stringify=function(krange_kpos,pat){
-	if ((krange_kpos/Math.pow(2,pat.kposbits))>1) {
+	if (isRange(krange_kpos,pat)) {
 		const r=breakKRange(krange_kpos,pat);
 		var e=stringifyKPos(r.end,pat);
 		var at=e.indexOf("p");
@@ -103,10 +110,18 @@ const stringify=function(krange_kpos,pat){
 		const s=stringifyKPos(r.start,pat);
 		const sarr=unpack(r.start,pat), earr=unpack(r.end,pat);
 
-		if (sarr[1]!==earr[1])      return s+'-'+e;
-		else if (sarr[2]!==earr[2]) return s+'-'+e.substr(e.length-4);
-		else if (sarr[3]!==earr[3])	return s+'-'+e.substr(e.length-2);
-
+		if (sarr[1]!==earr[1]) { //different page
+			if (pat.column) {
+				if (Math.floor(sarr[1]/pat.column)==Math.floor(earr[1]/pat.column)) {
+					return s+'-'+e.substr(e.length-5);//end page is omitted
+				}
+			}
+			return s+'-'+e;
+		} else if (sarr[2]!==earr[2]) { //diffrent line
+			return s+'-'+e.substr(e.length-4);
+		} else if (sarr[3]!==earr[3])	{ //different char
+			return s+'-'+e.substr(e.length-2);
+		}
 		return s;
 	} else {
 		return stringifyKPos(krange_kpos,pat);

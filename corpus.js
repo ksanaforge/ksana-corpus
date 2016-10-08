@@ -36,7 +36,7 @@ const parseRange=function(kRange,pat){
 	
 	const startarr=Ksanapos.unpack(r.start,pat);
 	var endarr=Ksanapos.unpack(r.end,pat);
-	return {startarr,endarr,start:r.start,end:r.end};
+	return {startarr,endarr,start:r.start,end:r.end,kRange};
 }
 const kPosUnpack=function(kpos,pat){
 	pat=pat||this.addressPattern;
@@ -51,29 +51,26 @@ const getPages=function(kRange,cb) {
 	return this.get(keys,{recursive:true},cb);
 }
 const trimRight=function(str,chcount) {
-	if (!str)return;
+	if (!str) return "";
 	var c=chcount,dis=0,t,s=str;
 
-	while (c) {
-		t=this.knext(s);
-		s=s.substr(t);
-		dis+=t;
-		c--;
-	}
+	t=this.knext(s,c);
+	dis+=t;
+	/*
+	s=s.substr(t);
 	while (s.charCodeAt(0)<0x3400||s.charCodeAt(0)>0xdfff){
 		s=s.substr(1);
 		dis++;
 	}	
+	*/
 	return str.substr(0,dis);
 }
 const trimLeft=function(str,chcount) {
+	if (!str) return "";
 	var c=chcount,dis=0,t,s=str;
-	while (c) {
-		t=this.knext(s);
-		s=s.substr(t);
-		dis+=t;
-		c--;
-	}
+	t=this.knext(s,c);
+	dis+=t;
+	s=s.substr(t);
 	while (s.charCodeAt(0)<0x3400||s.charCodeAt(0)>0xdfff){
 		s=s.substr(1);
 		dis++;
@@ -119,13 +116,17 @@ const getText=function(kRange,cb){ //good for excerpt listing
 
 const fileOf=function(kRange_address){
 	var kRange=kRange_address;
+	const pat=this.addressPattern;
 	if (typeof kRange_address=="string") {
-		kRange=Ksanapos.parse(kRange_address,this.addressPattern);
+		kRange=Ksanapos.parse(kRange_address,pat);
 	}
+	const range=Ksanapos.breakKRange(kRange,pat);
+
 	const filepos=this.get(["fields","file","pos"]);
 	const filename=this.get(["fields","file","value"]);
 	if (!filepos) return -1;
-	const at=bsearch(filepos,kRange+1,true);
+
+	const at=bsearch(filepos,range.start+1,true);
 	var start=filepos[at-1];
 	if (!start)start=0;
 	return {at:at-1, filename:filename[at-1], end:filepos[at], start};
@@ -188,10 +189,62 @@ const advanceLineChar=function(kpos,advline,linetext){
 	arr[3]=this.kcount(linetext);
 	return Ksanapos.makeKPos(arr,pat);
 }
+const lineCharOffset=function(beginkpos,kpos_address,getLine){
+	const pat=this.addressPattern;
+	const begin=Ksanapos.unpack(beginkpos,pat);
+	var start,end,r;
+	if (typeof kpos_address=="string") {
+		const range=Ksanapos.parse(kpos_address,pat);
+		r=Ksanapos.breakKRange(range,pat);
+	} else {
+		r=Ksanapos.breakKRange(kpos_address,pat);
+	}
+
+	start=r.start
+	end=r.end;
+
+	const sarr=Ksanapos.unpack(start,pat);
+	const earr=Ksanapos.unpack(end,pat);
+
+	const firstline=(begin[1]*pat.maxline+begin[2]);
+	const line=(sarr[1]*pat.maxline+sarr[2])-firstline;
+	const line2=(earr[1]*pat.maxline+earr[2])-firstline;
+	const l1=getLine(line),l2=getLine(line2);
+	
+	var ch=this.knext(l1,sarr[3]);
+	var ch2=this.knext(l2,earr[3]);
+
+	//skip puncuation, hacky
+	var code=l1.charCodeAt(ch);
+	while (ch<l1.length && (code<0x3400 || code>=0xdfff)) {
+		ch++;
+		code=l1.charCodeAt(ch);
+	}
+	
+	start={line,ch};
+	end={line:line2,ch:ch2};
+	return {start,end}
+}
 const stringify=function(krange_kpos,kend){
 	const pat=this.addressPattern;
 	if (kend) return Ksanapos.stringify(Ksanapos.makeKRange(krange_kpos,kend,pat),pat);
 	return Ksanapos.stringify(krange_kpos,pat);
+}
+const extractKPos=function(text){
+	var out={},pat=this.addressPattern,fileOf=this.fileOf.bind(this);
+	text.replace(this.addressRegex,function(m,m1){
+		const kRange=Ksanapos.parse(m1,pat);
+		if (typeof kRange!=="undefined") {
+			var f=fileOf(kRange);
+			if (!f.filename) return;
+			if (!out[f.filename]) out[f.filename]=[];
+			out[f.filename].push(kRange);
+		}
+	});
+	return out;
+}
+const makeKRange=function(kstart,kend){
+	return Ksanapos.makeKRange(kstart,kend,this.addressPattern);
 }
 //get a juan and break by p
 const init=function(engine){
@@ -204,10 +257,14 @@ const init=function(engine){
 	engine.fileOf=fileOf;
 	engine.getFile=getFile;
 	engine.stringify=stringify;
+	engine.makeKRange=makeKRange;
 	//engine.kPosUnpack=kPosUnpack;
 	engine.advanceLineChar=advanceLineChar;
+	engine.lineCharOffset=lineCharOffset;
 	engine.parseRange=parseRange;
 	engine.getFileName=getFileName;
+	engine.extractKPos=extractKPos;
+	engine.addressRegex=/@([\dpabcd]+-[\dabcd]+);?/g;
 	engine.kcount=Ksanacount.getCounter(engine.meta.language);
 	engine.knext=Ksanacount.getNext(engine.meta.language);
 }
