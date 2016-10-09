@@ -1,21 +1,30 @@
 const bsearch=require("./bsearch");
 const Ksanapos=require("./ksanapos");
-
-const trimRight=function(str,chcount) {
+const isOpenBracket=function(c){
+	return "︽〈【「〔《『﹁︿﹙﹛〝︵｛".indexOf(c)>-1;
+}
+const trimRight=function(str,chcount,includePunc) {
 	if (!str) return "";
-	var c=chcount,dis=0,t,s=str;
+	var c=chcount,dis=0,t,s=str,code;
 
 	t=this.knext(s,c);
 	dis+=t;
-	/*
+	
 	s=s.substr(t);
-	while (s.charCodeAt(0)<0x3400||s.charCodeAt(0)>0xdfff){
-		s=s.substr(1);
-		dis++;
-	}	
-	*/
+	code=s.charCodeAt(0);
+	if (includePunc) {
+		while ((code<0x3400||code>0xdfff)&&
+			!isOpenBracket(s[0])){
+			s=s.substr(1);
+			code=s.charCodeAt(0);
+			dis++;
+		}	
+	}
+	
 	return str.substr(0,dis);
 }
+
+
 const trimLeft=function(str,chcount) {
 	if (!str) return "";
 	var c=chcount,dis=0,t,s=str;
@@ -44,14 +53,22 @@ const layoutText=function(text,startkpos,breaks){
 				pagebreaks.push(kpos); //show page break on screen
 			}
 			if (breaks) {
-				if (nbreak<breaks.length&&nextkpos>breaks[nbreak]) {
-					const leftpart=trimRight.call(this,text[i],breaks[nbreak]-kpos);
-					lines.push(linetext+leftpart);
-					linetext=text[i].substr(leftpart.length);
+				var breakcount=0,t=text[i],consumed=0;
+				while (nbreak<breaks.length&&nextkpos>breaks[nbreak]) {
+					breakcount++;
+					const leftpart=trimRight.call(this,text[i],breaks[nbreak]-kpos,true);
+					lines.push(linetext+leftpart.substr(consumed));
+					consumed=leftpart.length;
+					linetext="";
 					nbreak++;
-				} else {
+				} 
+				
+				if (!breakcount) {
 					linetext+=text[i];
+				} else {
+					linetext=text[i].substr(consumed);//remaining
 				}
+				
 			} else {
 				lines.push(text[i]);
 				linebreaks.push(kpos);
@@ -97,12 +114,12 @@ const advanceLineChar=function(kpos,advline,linetext){
 		return kpos;
 	}
 }
-const parseRange=function(kRange,pat){
+const parseRange=function(kRange,pat,forceRange){
 	if (typeof pat=="undefined") pat=this.addressPattern;
 	if (typeof kRange=="string") {
 		kRange=Ksanapos.parse(kRange,pat);
 	}
-	const r=Ksanapos.breakKRange(kRange,pat);
+	const r=Ksanapos.breakKRange(kRange,pat,forceRange);
 	
 	const startarr=Ksanapos.unpack(r.start,pat);
 	var endarr=Ksanapos.unpack(r.end,pat);

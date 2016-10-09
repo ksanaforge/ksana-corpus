@@ -50,8 +50,9 @@ var makeKPos=function(nums,pat){
 
 	return kpos;
 }
-const breakKRange=function(kRange,pat){
-	if (isRange(kRange,pat)){
+//kstart might be zero if book=0,page=0,line=0,ch=0
+const breakKRange=function(kRange,pat,forceRange){
+	if (forceRange||isRange(kRange,pat)){
 		var r=Math.pow(2,pat.rangebits);
 		var dis=Math.floor(kRange%r);
 		start=Math.floor(kRange/r);
@@ -99,7 +100,7 @@ const stringifyKPos=function(kpos,pat){
 }
 //not valid if kpos_start==0
 const isRange=function(k,pat){
-	return (k/Math.pow(2,pat.kposbits))>1;
+	return (k/Math.pow(2,pat.rangebits))>1;
 }
 const stringify=function(krange_kpos,pat){
 	if (isRange(krange_kpos,pat)) {

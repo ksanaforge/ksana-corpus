@@ -32,7 +32,7 @@ const makeTextKeys=function(s,e,hascol){//without col
 }
 
 const getPages=function(kRange,cb) {
-	const r=textutil.parseRange.call(this,kRange,this.addressPattern);
+	const r=textutil.parseRange.call(this,kRange,this.addressPattern,true);
 
 	const keys=makeTextKeys(r.startarr,r.endarr,this.addressPattern.columnbits)
 	
@@ -46,9 +46,10 @@ const getText=function(kRange,cb){ //good for excerpt listing
 	}
 	const trimpages=function(pages){
 		var out=[],i,pat=this.addressPattern;
-		const r=textutil.parseRange.call(this,kRange,this.addressPattern);
+		const r=textutil.parseRange.call(this,kRange,this.addressPattern,true);
 		const startpage=r.startarr[1],endpage=r.endarr[1];
 		for (i=startpage;i<=endpage;i++){
+			if (typeof pages[i-startpage]=="undefined")continue;
 			var pg=JSON.parse(JSON.stringify(pages[i-startpage]));
 			if (i!=endpage){ //fill up array to max page line
 				while (pg.length<pat.maxline) pg.push("");
@@ -69,7 +70,9 @@ const getText=function(kRange,cb){ //good for excerpt listing
 	}
 
 	var stockpages=getPages.call(this,kRange,function(pages){
-		trimpages.call(this,pages);
+		setTimeout(
+			function(){trimpages.call(this,pages)}.bind(this),0
+		);
 	}.bind(this));
 	if (typeof stockpages!=="undefined"&&
 		typeof stockpages!=="string") return trimpages(stockpages);
