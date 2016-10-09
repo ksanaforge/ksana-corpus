@@ -42,7 +42,7 @@ const layoutText=function(text,startkpos,breaks){
 		var nextkpos;//kpos of next line start
 		
 		for (var i=0;i<text.length;i++) {
-			nextkpos=this.advanceLineChar(startkpos,i+1);
+			nextkpos=advanceLineChar.call(this,startkpos,i+1);
 			page=this.pageOf(kpos);
 			if (prevpage!==page) {
 				while (lines.length>0&&!lines[lines.length-1].trim()) { 

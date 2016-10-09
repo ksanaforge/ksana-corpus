@@ -39,5 +39,21 @@ const toLogicalRange=function(linebreaks,address,getLine){ //find logical line
 	const end=toLogicalPos.call(this,linebreaks,krange.end,getLine);	
 	return {start,end};
 }
+const fromLogicalPos=function(textline,ch,startkpos,getLine){
+	var start=this.bookLineOf(startkpos);
+	var line=getLine(start);
+	var offset=textutil.trimRight.call(this,line,this.charOf(startkpos),true).length;
+	line=line.substr(offset);
+	if (line.length>=ch) { //ch is in this line
+		return startkpos+this.kcount(textline.substr(0,ch));
+	}
+	var now=start;
+	while (ch>line.length) { //decrease ch with length of raw line
+		ch-=line.length;
+		line=getLine(++now);
+	}
+	t=line.substr(0,ch); //remain text from closest raw line till pos::ch
+	return textutil.advanceLineChar.call(this,startkpos,now-start,t);
+}
 
-module.exports={toLogicalPos,toLogicalRange};
+module.exports={toLogicalPos,toLogicalRange,fromLogicalPos};
