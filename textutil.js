@@ -1,4 +1,3 @@
-const bsearch=require("./bsearch");
 const Ksanapos=require("./ksanapos");
 const isOpenBracket=function(c){
 	return "︽〈【「〔《『﹁︿﹙﹛〝︵｛".indexOf(c)>-1;
@@ -54,6 +53,7 @@ const layoutText=function(text,startkpos,breaks){
 			}
 			if (breaks) {
 				var breakcount=0,t=text[i],consumed=0;
+				//one text line might consist more than one p
 				while (nbreak<breaks.length&&nextkpos>breaks[nbreak]) {
 					breakcount++;
 					const leftpart=trimRight.call(this,text[i],breaks[nbreak]-kpos,true);
@@ -68,7 +68,6 @@ const layoutText=function(text,startkpos,breaks){
 				} else {
 					linetext=text[i].substr(consumed);//remaining
 				}
-				
 			} else {
 				lines.push(text[i]);
 				linebreaks.push(kpos);
@@ -126,31 +125,6 @@ const parseRange=function(kRange,pat,forceRange){
 	return {startarr,endarr,start:r.start,end:r.end,kRange};
 }
 
-const toLogicalRange=function(linebreaks,address,getLine){ //find logical line
-	krange=parseRange.call(this,address);
-
-	var line=bsearch(linebreaks,krange.start,true)-1;
-	var line2=bsearch(linebreaks,krange.end,true)-1;
-
-	line=(line<0)?0:line;
-	line2=(line2<0)?0:line2;
-
-	var l1=getLine(line), l2=getLine(line2);
-
-	var ch=this.knext(l1, krange.start-linebreaks[line]  );
-	var ch2=this.knext(l2,krange.end - linebreaks[line2]);
-
-	//skip puncuation, hacky
-	var code=l1.charCodeAt(ch);
-	while (ch<l1.length && (code<0x3400 || code>=0xdfff)) {
-		ch++;
-		code=l1.charCodeAt(ch);
-	}
-	
-	start={line,ch};
-	end={line:line2,ch:ch2};
-	return {start,end};
-}
 const kPosUnpack=function(kpos,pat){
 	pat=pat||this.addressPattern;
 	const startarr=Ksanapos.unpack(kpos,pat);
@@ -167,6 +141,11 @@ const pageOf=function(address){
 	const arr=kPosUnpack.call(this,r.start);
 	return arr[1];
 }
+const bookLineOf=function(address){ //line counting from this book
+	const r=parseRange(address,this.addressPattern);
+	const arr=kPosUnpack.call(this,r.start);
+	return arr[1]*this.addressPattern.maxline+arr[2];
+}
 const lineOf=function(address){
 	const r=parseRange(address,this.addressPattern);
 	const arr=kPosUnpack.call(this,r.start);
@@ -179,4 +158,4 @@ const charOf=function(address){
 }
 
 module.exports={trimLeft,trimRight,parseRange,bookOf,pageOf,lineOf,charOf,
-	layoutText,extractKPos,advanceLineChar,toLogicalRange};
+	bookLineOf,	layoutText,extractKPos,advanceLineChar};

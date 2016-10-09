@@ -3,6 +3,7 @@ const Ksanapos=require("./ksanapos");
 const Ksanacount=require("./ksanacount");
 const createTokenizer=require("./tokenizer").createTokenizer;
 const textutil=require("./textutil");
+const coordinate=require("./coordinate");
 const getField=function(name,cb){
 	return this.get(["fields",name],{recursive:true},function(data){return cb&&cb(data)});
 }
@@ -187,10 +188,11 @@ const init=function(engine){
 	engine.parseRange=textutil.parseRange;
 	engine.getFileName=getFileName;
 	engine.extractKPos=textutil.extractKPos;
-	engine.toLogicalRange=textutil.toLogicalRange;
+	engine.toLogicalRange=coordinate.toLogicalRange;
+	engine.toLogicalPos=coordinate.toLogicalPos;
 	engine.advanceLineChar=textutil.advanceLineChar;
 	engine.layoutText=textutil.layoutText;
-
+	engine.bookLineOf=textutil.bookLineOf;
 	engine.addressRegex=/@([\dpabcd]+-[\dabcd]+);?/g;
 	engine.kcount=Ksanacount.getCounter(engine.meta.language);
 	engine.knext=Ksanacount.getNext(engine.meta.language);
