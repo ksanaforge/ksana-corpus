@@ -15,12 +15,12 @@ const buildAddressPattern=function(b,column){
 					bookbits,pagebits,linebits,charbits,rangebits,column};
 }
 var checknums=function(nums,pat){
-	if (nums[4]>pat.maxchar) {
-		console.error(nums[4],"exceed maxchar",pat.maxchar)
+	if (nums[3]>pat.maxchar) {
+		console.error(nums[3],"exceed maxchar",pat.maxchar)
 		return 0;
 	}
-	if (nums[3]>pat.maxpage) {
-		console.error(nums[3],"exceed maxpage",pat.maxpage)
+	if (nums[2]>pat.maxline) {
+		console.error(nums[2],"exceed maxline",pat.maline)
 		return 0;
 	}
 	if (nums[1]>pat.maxpage) {
@@ -100,7 +100,7 @@ const stringifyKPos=function(kpos,pat){
 }
 //not valid if kpos_start==0
 const isRange=function(k,pat){
-	return (k/Math.pow(2,pat.rangebits))>1;
+	return (k/Math.pow(2,pat.kposbits))>1;
 }
 const stringify=function(krange_kpos,pat){
 	if (isRange(krange_kpos,pat)) {

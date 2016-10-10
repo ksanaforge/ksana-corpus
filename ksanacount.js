@@ -1,7 +1,7 @@
 /*
 	given a string , return count
 */
-var {parseIDS}=require("./tokenizer");
+var parseIDS=require("./tokenizer").parseIDS;
 
 const isWestern=function(c){
 return (c>=0x41&&c<=0x5a) ||(c>=0x61&&c<=0x7a)
