@@ -15,19 +15,19 @@ const buildAddressPattern=function(b,column){
 					bookbits,pagebits,linebits,charbits,rangebits,column};
 }
 var checknums=function(nums,pat){
-	if (nums[3]>pat.maxchar) {
+	if (nums[3]>=pat.maxchar) {
 		console.error(nums[3],"exceed maxchar",pat.maxchar)
 		return 0;
 	}
-	if (nums[2]>pat.maxline) {
-		console.error(nums[2],"exceed maxline",pat.maline)
+	if (nums[2]>=pat.maxline) {
+		console.error(nums[2],"exceed maxline",pat.maxline)
 		return 0;
 	}
-	if (nums[1]>pat.maxpage) {
+	if (nums[1]>=pat.maxpage) {
 		console.error(nums[1],"exceed maxpage",pat.maxpage)
 		return 0;
 	}
-	if (nums[0]>pat.maxbook) {
+	if (nums[0]>=pat.maxbook) {
 		console.error(nums[0],"exceed maxbook",pat.maxbook)
 		return 0;
 	}

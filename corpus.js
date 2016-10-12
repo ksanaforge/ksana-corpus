@@ -80,7 +80,7 @@ const getText=function(kRange,cb){ //good for excerpt listing
 	//remove extra leading and tailing line	
 }
 
-const fileOf=function(kRange_address){
+const articleOf=function(kRange_address){
 	var kRange=kRange_address;
 	const pat=this.addressPattern;
 	if (typeof kRange_address=="string") {
@@ -88,31 +88,31 @@ const fileOf=function(kRange_address){
 	}
 	const range=Ksanapos.breakKRange(kRange,pat);
 
-	const filepos=this.get(["fields","file","pos"]);
-	const filename=this.get(["fields","file","value"]);
-	if (!filepos) return -1;
+	const articlepos=this.get(["fields","article","pos"]);
+	const articlename=this.get(["fields","article","value"]);
+	if (!articlepos) return -1;
 
-	const at=bsearch(filepos,range.start+1,true);
-	var start=filepos[at-1];
+	const at=bsearch(articlepos,range.start+1,true);
+	var start=articlepos[at-1];
 	if (!start)start=0;
-	return {at:at-1, filename:filename[at-1], end:filepos[at], start};
+	return {at:at-1, articlename:articlename[at-1], end:articlepos[at], start};
 }
 
-const getFileName=function(id){
-	const filenames=this.get(["fields","file","value"]);
-	return filenames[id];
+const getArticleName=function(id){
+	const articlenames=this.get(["fields","article","value"]);
+	return articlenames[id];
 }
-const getFile=function(id_name,cb){
-	const filepos=this.get(["fields","file","pos"]);
-	const filename=this.get(["fields","file","value"]);
+const getArticle=function(id_name,cb){
+	const articlepos=this.get(["fields","article","pos"]);
+	const articlename=this.get(["fields","article","value"]);
 	var start,end;
 	if (typeof id_name==="string") {
-		const at=filename.indexOf(id_name);
-		start=filepos[at];
-		end=filepos[at+1];
+		const at=articlename.indexOf(id_name);
+		start=articlepos[at];
+		end=articlepos[at+1];
 	} else if (typeof id_name==="number"){
-		start=filepos[id_name];
-		end=filepos[id_name+1];
+		start=articlepos[id_name];
+		end=articlepos[id_name+1];
 	}
 
 	if (typeof start==="undefined") {
@@ -177,16 +177,16 @@ const init=function(engine){
 	engine.getFieldNames=getFieldNames;
 	engine.getPages=getPages;
 	engine.getText=getText;
-	engine.fileOf=fileOf;
+	engine.articleOf=articleOf;
 	engine.bookOf=textutil.bookOf;
 	engine.pageOf=textutil.pageOf;
 	engine.lineOf=textutil.lineOf;
 	engine.charOf=textutil.charOf;
-	engine.getFile=getFile;
+	engine.getArticle=getArticle;
 	engine.stringify=stringify;
 	engine.makeKRange=makeKRange;
 	engine.parseRange=textutil.parseRange;
-	engine.getFileName=getFileName;
+	engine.getArticleName=getArticleName;
 	engine.extractKPos=textutil.extractKPos;
 	engine.toLogicalRange=coordinate.toLogicalRange;
 	engine.toLogicalPos=coordinate.toLogicalPos;
