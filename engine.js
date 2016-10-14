@@ -40,7 +40,20 @@ const createEngine=function(kdb,opts,cb){//preload meta and other fields
 	});
 }
 
-
+const prepareEngine=function(id,kdb,opts,cb){
+	createEngine(kdb,opts,function(err2,engine){
+		opening="";
+		if (err2) cb(err2);
+		else {
+			if (engine&&engine.meta){
+				pool[id]=engine;
+				cb(0,engine);						
+			} else {
+				cb(id+" is invalid");
+			}
+		} 
+	});
+}
 const open=function(id,opts,cb){
 	if (typeof opts=="function") {
 		cb=opts;
@@ -58,23 +71,19 @@ const open=function(id,opts,cb){
 	if (fn.indexOf(".cor")==-1) fn+=".cor";
 	opening=id;
 
-	new JsonRom.open(fn,function(err,kdb){
+	fn2=id+"-corpus/"+fn;
+	JsonRom.open(fn,function(err,kdb){
 		if (err) {
-			opening="";
-			cb(err);
-		} else {
-			createEngine(kdb,opts,function(err2,engine){
-				opening="";
-				if (err2) cb(err2);
-				else {
-					if (engine&&engine.meta){
-						pool[id]=engine;
-						cb(0,engine);						
-					} else {
-						cb(id+" is invalid");
-					}
-				} 
+			JsonRom.open(fn2,function(err2,kdb2){
+				if (err2) {
+					opening="";
+					cb(err);					
+				} else {
+					prepareEngine(id,kdb2,opts,cb)
+				}
 			});
+		} else {
+			prepareEngine(id,kdb,opts,cb)
 		}
 	});
 }
