@@ -48,7 +48,7 @@ var makeKPos=function(nums,pat){
 	kpos+= nums[1]*mul; mul*=Math.pow(2,pat.pagebits);
 	kpos+= nums[0]*mul;
 
-	return kpos;
+	return kpos+1;
 }
 //kstart might be zero if book=0,page=0,line=0,ch=0
 const breakKRange=function(kRange,pat,forceRange){
@@ -74,6 +74,7 @@ const makeKRange=function(startkpos,endkpos,pat){
 	return startkpos*Math.pow(2,pat.rangebits)+r;
 }
 var unpack=function(kpos,pat){
+	kpos--;
 	var ch=kpos%pat.maxchar;
 	var line=Math.floor((kpos/pat.maxchar)%pat.maxline);
 	var page=Math.floor((kpos/ Math.pow(2,pat.charbits+pat.linebits)) %pat.maxpage);
@@ -100,7 +101,7 @@ const stringifyKPos=function(kpos,pat){
 }
 //not valid if kpos_start==0
 const isRange=function(k,pat){
-	return (k/Math.pow(2,pat.kposbits))>1;
+	return (k/Math.pow(2,pat.kposbits-1))>1;
 }
 const stringify=function(krange_kpos,pat){
 	if (isRange(krange_kpos,pat)) {

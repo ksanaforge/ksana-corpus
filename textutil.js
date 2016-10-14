@@ -83,14 +83,14 @@ const layoutText=function(text,startkpos,breaks){
 		return {linebreaks,pagebreaks,lines};
 }
 const extractKPos=function(text){
-	var out={},pat=this.addressPattern,fileOf=this.fileOf.bind(this);
+	var out={},pat=this.addressPattern,articleOf=this.articleOf.bind(this);
 	text.replace(this.addressRegex,function(m,m1){
 		const kRange=Ksanapos.parse(m1,pat);
 		if (typeof kRange!=="undefined") {
-			var f=fileOf(kRange);
-			if (!f.filename) return;
-			if (!out[f.filename]) out[f.filename]=[];
-			out[f.filename].push(kRange);
+			var f=articleOf(kRange);
+			if (!f.articlename) return;
+			if (!out[f.articlename]) out[f.articlename]=[];
+			out[f.articlename].push(kRange);
 		}
 	});
 	return out;
