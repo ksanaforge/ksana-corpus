@@ -191,14 +191,14 @@ const parse=function(address,pat){
 	parseLineChar(arr,m[4]);
 
 	var start=makeKPos(arr,pat);
-	var end;
+	var end=start;
 
 	const at=address.indexOf("-");
 	if (at>-1) {
 		remain=address.substr(at+1);
 		end=parseRemain(remain,pat,arr);
 	} else {
-		end+=start+1;
+		end+=1;
 	}
 	
 	return makeKRange(start,end,pat);

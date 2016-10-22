@@ -92,9 +92,12 @@ const articleOf=function(kRange_address){
 	const articlename=this.get(["fields","article","value"]);
 	if (!articlepos) return -1;
 
-	const at=bsearch(articlepos,range.start+1,true);
+	var at=bsearch(articlepos,range.start+1,true);
 	var start=articlepos[at-1];
-	if (!start)start=0;
+	if (!start) {
+		at=1;
+		start=0;
+	}
 	return {at:at-1, articlename:articlename[at-1], end:articlepos[at], start};
 }
 

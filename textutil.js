@@ -117,6 +117,7 @@ const parseRange=function(kRange,pat,forceRange){
 	if (typeof pat=="undefined") pat=this.addressPattern;
 	if (typeof kRange=="string") {
 		kRange=Ksanapos.parse(kRange,pat);
+		forceRange=true;
 	}
 	const r=Ksanapos.breakKRange(kRange,pat,forceRange);
 	

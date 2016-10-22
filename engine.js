@@ -72,9 +72,9 @@ const open=function(id,opts,cb){
 	opening=id;
 
 	fn2=id+"-corpus/"+fn;
-	JsonRom.open(fn,function(err,kdb){
+	new JsonRom.open(fn,function(err,kdb){
 		if (err) {
-			JsonRom.open(fn2,function(err2,kdb2){
+			new JsonRom.open(fn2,function(err2,kdb2){
 				if (err2) {
 					opening="";
 					cb(err);					
