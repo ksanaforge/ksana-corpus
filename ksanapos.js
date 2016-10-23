@@ -71,6 +71,11 @@ const makeKRange=function(startkpos,endkpos,pat){
 		//throw "range too far "+ r;
 		r=pat.maxrange-1;
 	}
+	if (startkpos>endkpos){
+		var t=endkpos;
+		endkpos=startkpos;
+		startkpos=t;
+	}
 	return startkpos*Math.pow(2,pat.rangebits)+r;
 }
 var unpack=function(kpos,pat){
