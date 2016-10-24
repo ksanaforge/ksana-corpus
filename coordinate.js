@@ -43,7 +43,7 @@ const fromLogicalPos=function(textline,ch,startkpos,getRawLine){
 	var start=this.bookLineOf(startkpos);
 	var line=getRawLine(start);
 	var offset=textutil.trimRight.call(this,line,this.charOf(startkpos),true).length;
-	if (line.length>=ch) { //ch is in this line
+	if ((line.length-offset)>=ch) { //ch is in this line
 		return startkpos+this.kcount(textline.substr(0,ch));
 	}
 	line=line.substr(offset);
