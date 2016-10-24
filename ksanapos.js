@@ -66,6 +66,13 @@ const makeKRange=function(startkpos,endkpos,pat){
 	if (isNaN(startkpos)||isNaN(endkpos)) {
 		return 0;
 	}
+	
+	if (startkpos>endkpos) {
+		const t=startkpos;
+		startkpos=endkpos;
+		endkpos=t;
+	}
+
 	var r=endkpos-startkpos;
 	if (r>pat.maxrange) {
 		//throw "range too far "+ r;
