@@ -22,15 +22,15 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,omitpunc) {
 		const k=parseRange.call(this,kpos);
 		kpos=k.start;
 	}
-	var line=bsearch(linebreaks,kpos+1,true)-1;
-	var eoff  =this.charOf(linebreaks[line]);
-	var linedis=this.bookLineOf(kpos)-this.bookLineOf(linebreaks[line]);
-	var chardis=getUnicodeCharDis.call(this,kpos,linebreaks[line],getRawLine);
-	var l1=getRawLine(this.bookLineOf(kpos));
-	var ch=textutil.trimRight.call(this,l1,this.charOf(kpos),omitpunc).length;
+	const line=bsearch(linebreaks,kpos+1,true)-1;
+	const eoff  =this.charOf(linebreaks[line]);
+	const linedis=this.bookLineOf(kpos)-this.bookLineOf(linebreaks[line]);
+	const chardis=getUnicodeCharDis.call(this,kpos,linebreaks[line],getRawLine);
+	const l1=getRawLine(this.bookLineOf(kpos));
+	const ch=textutil.trimRight.call(this,l1,this.charOf(kpos),omitpunc).length;
 
-	//leftpart of this rawline is in previous paragraph,maxchar less than 100
-	var prevcount=textutil.trimRight.call(this,l1,eoff,true).length;
+	const paragraphfirstline=getRawLine(this.bookLineOf(linebreaks[line]));
+	const prevcount=textutil.trimRight.call(this,paragraphfirstline,eoff,!omitpunc).length;
 	return {line,ch:ch+chardis-prevcount};
 }
 const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical line
