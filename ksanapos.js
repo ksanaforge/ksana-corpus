@@ -83,7 +83,9 @@ const makeKRange=function(startkpos,endkpos,pat){
 		endkpos=startkpos;
 		startkpos=t;
 	}
-	return startkpos*Math.pow(2,pat.rangebits)+r;
+	const maxrange=Math.pow(2,pat.rangebits);
+	if (r>=maxrange) r=maxrange-1;
+	return startkpos*maxrange+r;
 }
 var unpack=function(kpos,pat){
 	kpos--;
