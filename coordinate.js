@@ -11,7 +11,10 @@ const getUnicodeCharDis=function(firstline,kpos,loglineKPos,getRawLine){
 
 	var ln1=this.bookLineOf(loglineKPos)-firstline;
 	while (linedis) {
-		chardis+=getRawLine(ln1++).length;
+		const rawline=getRawLine(ln1);
+		if (!rawline) break;
+		ln1++;
+		chardis+=rawline.length;
 		linedis--;
 	}
 	return chardis;
