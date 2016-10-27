@@ -17,13 +17,18 @@ const getFieldNames=function(cb){
 	return r?Object.keys(r):[];
 }
 
-const makeTextKeys=function(s,e,hascol){//without col
-	var keys=[],pg,co;
+const makeBookKey=function(s,e,hascol){
+	return ["texts",s[0]];	
+}
+
+const makePageKeys=function(s,e,column,maxpage){//without col
+	var keys=[],pg,col;
 	const bk=s[0];
 	for (pg=s[1];pg<=e[1];pg++) {
-		if (hascol){
-			for (col=s[2];col<e[2];col++){
-				keys.push(["texts",s[0],pg,col]);	
+		if (pg>=maxpage) break;
+		if (column){
+			for (col=0;col<column;col++){
+				keys.push(["texts",bk,pg+col]);
 			}
 		} else {
 			keys.push(["texts",bk,pg]);	
@@ -34,10 +39,14 @@ const makeTextKeys=function(s,e,hascol){//without col
 
 const getPages=function(kRange,cb) {
 	const r=textutil.parseRange.call(this,kRange,this.addressPattern,true);
+	const column=this.addressPattern.column;
+	const bookkey=makeBookKey(r.startarr,r.endarr,column);
 
-	const keys=makeTextKeys(r.startarr,r.endarr,this.addressPattern.columnbits)
-	
-	return this.get(keys,{recursive:true},cb);
+	this.get(bookkey,function(data){
+		const maxpage=data.length;
+		const keys=makePageKeys(r.startarr,r.endarr,column,maxpage);
+		return this.get(keys,{recursive:true},cb);
+	}.bind(this));
 }
 
 const getText=function(kRange,cb){ //good for excerpt listing
