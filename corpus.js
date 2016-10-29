@@ -4,12 +4,13 @@ const Ksanacount=require("./ksanacount");
 const createTokenizer=require("./tokenizer").createTokenizer;
 const textutil=require("./textutil");
 const coordinate=require("./coordinate");
+const TOC=require("./toc");
 const getField=function(name,cb){
-	return this.get(["fields",name],{recursive:true},function(data){return cb&&cb(data)});
+	return this.get(["fields",name],{recursive:true},cb);
 }
 
 const getBookField=function(name,book,cb){
-	return this.get(["fields",name,book],{recursive:true},function(data){return cb&&cb(data)});	
+	return this.get(["fields",name,book],{recursive:true},cb);	
 }
 
 const getFieldNames=function(cb){
@@ -88,7 +89,17 @@ const getText=function(kRange,cb){ //good for excerpt listing
 		typeof stockpages!=="string") return trimpages(stockpages);
 	//remove extra leading and tailing line	
 }
-
+const getArticle=function(at,nav) {
+	const articlepos=this.get(["fields","article","pos"]);
+	const articlename=this.get(["fields","article","value"]);
+	if (!articlepos) return null;
+	at+=nav;
+	const start=articlepos[at];
+	var end=articlepos[at+1];
+	if (!start)return null;
+	if (typeof end=="undefined") end=this.meta.endpos;
+	return {at, articlename:articlename[at], end, start};
+}
 const articleOf=function(kRange_address){
 	var kRange=kRange_address;
 	const pat=this.addressPattern;
@@ -107,14 +118,16 @@ const articleOf=function(kRange_address){
 		at=1;
 		start=0;
 	}
-	return {at:at-1, articlename:articlename[at-1], end:articlepos[at], start};
+	var end=articlepos[at];
+	if (typeof end=="undefined") end=this.meta.endpos;
+	return {at:at-1, articlename:articlename[at-1], end, start};
 }
 
 const getArticleName=function(id){
 	const articlenames=this.get(["fields","article","value"]);
 	return articlenames[id];
 }
-const getArticle=function(id_name,cb){
+const getArticleText=function(id_name,cb){
 	const articlepos=this.get(["fields","article","pos"]);
 	const articlename=this.get(["fields","article","value"]);
 	var start,end;
@@ -130,6 +143,10 @@ const getArticle=function(id_name,cb){
 	if (typeof start==="undefined") {
 		cb(null)
 		return null;
+	}
+
+	if (typeof end==="undefined"){
+		end=this.meta.endpos;
 	}
 
 	const krange=Ksanapos.makeKRange(start,end,this.addressPattern);
@@ -198,6 +215,7 @@ const init=function(engine){
 	engine.stringify=stringify;
 	engine.makeKRange=makeKRange;
 	engine.parseRange=textutil.parseRange;
+	engine.getArticleText=getArticleText;
 	engine.getArticleName=getArticleName;
 	engine.extractKPos=textutil.extractKPos;
 	engine.toLogicalRange=coordinate.toLogicalRange;
@@ -205,9 +223,13 @@ const init=function(engine){
 	engine.fromLogicalPos=coordinate.fromLogicalPos;
 	engine.layoutText=textutil.layoutText;
 	engine.bookLineOf=textutil.bookLineOf;
+	engine.getTOC=TOC.getTOC;
+	engine.getSubTOC=TOC.getSubTOC;
 	engine.addressRegex=/@([\dpabcd]+-[\dabcd]+);?/g;
 	engine.kcount=Ksanacount.getCounter(engine.meta.language);
 	engine.knext=Ksanacount.getNext(engine.meta.language);
+	engine.cachedSubTOC={};
+	engine.cachedTOC=[];
 }
 
 module.exports={init};

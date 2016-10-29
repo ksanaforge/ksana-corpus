@@ -30,7 +30,10 @@ const createEngine=function(kdb,opts,cb){//preload meta and other fields
 	}
 
 	opts.preload=opts.preload||[]; //user specified preload
-	var preload=[["meta"],["fields","article"]];
+	var preload=[["meta"]
+	,["fields","article"]
+	,["fields","toc"],["fields","subtoc_range"]
+	];
 	opts.preload.forEach(function(p){preload.push(p)});
 
 	engine.get(preload,{recursive:true},function(res){
