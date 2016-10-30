@@ -25,7 +25,11 @@ const makeBookKey=function(s,e,hascol){
 const makePageKeys=function(s,e,column,maxpage){//without col
 	var keys=[],pg,col;
 	const bk=s[0];
-	for (pg=s[1];pg<=e[1];pg++) {
+	var endpage=e[1];
+	if (e[0]>s[0]) {//crossing book
+		endpage=maxpage;
+	}
+	for (pg=s[1];pg<=endpage;pg++) {
 		if (pg>=maxpage) break;
 		if (column){
 			for (col=0;col<column;col++){
@@ -49,16 +53,23 @@ const getPages=function(kRange,cb) {
 		return this.get(keys,{recursive:true},cb);
 	}.bind(this));
 }
-
+const parseRange=function(krange){
+	return textutil.parseRange.call(this,krange,this.addressPattern,true);
+}
 const getText=function(kRange,cb){ //good for excerpt listing
 	//call getPages
 	if (typeof kRange==="object") {
 		return getTexts.call(this,kRange,cb);
 	}
 	const trimpages=function(pages){
-		var out=[],i,pat=this.addressPattern;
+		var out=[],i;
 		const r=textutil.parseRange.call(this,kRange,this.addressPattern,true);
-		const startpage=r.startarr[1],endpage=r.endarr[1];
+		const pat=this.addressPattern;
+		const startpage=r.startarr[1];
+		var endpage=r.endarr[1];
+		if (r.endarr[0]>r.startarr[0]) {
+			endpage=startpage+pages.length;
+		}
 		for (i=startpage;i<=endpage;i++){
 			if (typeof pages[i-startpage]=="undefined")continue;
 			var pg=JSON.parse(JSON.stringify(pages[i-startpage]));
@@ -93,7 +104,7 @@ const getArticle=function(at,nav) {
 	const articlepos=this.get(["fields","article","pos"]);
 	const articlename=this.get(["fields","article","value"]);
 	if (!articlepos) return null;
-	at+=nav;
+	at+=(nav||0);
 	const start=articlepos[at];
 	var end=articlepos[at+1];
 	if (!start)return null;
@@ -116,7 +127,7 @@ const articleOf=function(kRange_address){
 	var start=articlepos[at-1];
 	if (!start) {
 		at=1;
-		start=0;
+		start=1;
 	}
 	var end=articlepos[at];
 	if (typeof end=="undefined") end=this.meta.endpos;
@@ -176,7 +187,7 @@ const getTexts=function(kRanges,cb){
 
 const stringify=function(krange_kpos,kend){
 	const pat=this.addressPattern;
-	if (kend) return Ksanapos.stringify(Ksanapos.makeKRange(krange_kpos,kend,pat),pat);
+	if (kend) return Ksanapos.stringify(Ksanapos.makeKRange(krange_kpos,kend,pat),pat,true);
 	return Ksanapos.stringify(krange_kpos,pat);
 }
 
@@ -214,7 +225,7 @@ const init=function(engine){
 	engine.getArticle=getArticle;
 	engine.stringify=stringify;
 	engine.makeKRange=makeKRange;
-	engine.parseRange=textutil.parseRange;
+	engine.parseRange=parseRange;
 	engine.getArticleText=getArticleText;
 	engine.getArticleName=getArticleName;
 	engine.extractKPos=textutil.extractKPos;

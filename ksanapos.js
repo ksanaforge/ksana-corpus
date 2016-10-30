@@ -64,7 +64,7 @@ const breakKRange=function(kRange,pat,forceRange){
 }
 const makeKRange=function(startkpos,endkpos,pat){
 	if (isNaN(startkpos)||isNaN(endkpos)) {
-		return 0;
+		return 1;
 	}
 	
 	if (startkpos>endkpos) {
@@ -77,11 +77,6 @@ const makeKRange=function(startkpos,endkpos,pat){
 	if (r>pat.maxrange) {
 		//throw "range too far "+ r;
 		r=pat.maxrange-1;
-	}
-	if (startkpos>endkpos){
-		var t=endkpos;
-		endkpos=startkpos;
-		startkpos=t;
 	}
 	const maxrange=Math.pow(2,pat.rangebits);
 	if (r>=maxrange) r=maxrange-1;
@@ -117,9 +112,9 @@ const stringifyKPos=function(kpos,pat){
 const isRange=function(k,pat){
 	return (k/Math.pow(2,pat.kposbits-1))>1;
 }
-const stringify=function(krange_kpos,pat){
-	if (isRange(krange_kpos,pat)) {
-		const r=breakKRange(krange_kpos,pat);
+const stringify=function(krange_kpos,pat,forceRange){
+	if (isRange(krange_kpos,pat)||forceRange) {
+		const r=breakKRange(krange_kpos,pat,true);
 		var e=stringifyKPos(r.end,pat);
 		var at=e.indexOf("p");
 		e=e.substr(at+1); //remove vol

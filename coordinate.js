@@ -45,8 +45,9 @@ const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical lin
 	return {start,end};
 }
 const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine){
-	const start=this.bookLineOf(startkpos);
+	const start=this.bookLineOf(startkpos)||0;
 	var line=getRawLine(start-firstline);
+	if (!line) return 1;
 	
 	var offset=textutil.trimRight.call(this,line,this.charOf(startkpos),true).length;
 	if ((line.length-offset)>=ch) { //ch is in this line
