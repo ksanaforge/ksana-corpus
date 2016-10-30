@@ -30,7 +30,7 @@ const trimLeft=function(str,chcount) {
 	t=this.knext(s,c);
 	dis+=t;
 	s=s.substr(t);
-	while (s.charCodeAt(0)<0x3400||s.charCodeAt(0)>0xdfff){
+	while (chcount&&s.charCodeAt(0)<0x3400||s.charCodeAt(0)>0xdfff){
 		s=s.substr(1);
 		dis++;
 	}
@@ -43,7 +43,7 @@ const layoutText=function(text,startkpos,breaks){
 		
 		for (var i=0;i<text.length;i++) {
 			nextkpos=advanceLineChar.call(this,startkpos,i+1);
-			page=this.pageOf(kpos);
+			page=this.pageOf(kpos)-1;
 			if (prevpage!==page) {
 				while (lines.length>0&&!lines[lines.length-1].trim()) { 
 					linebreaks.pop();
@@ -113,13 +113,12 @@ const advanceLineChar=function(kpos,advline,linetext){
 		return kpos;
 	}
 }
-const parseRange=function(kRange,pat,forceRange){
+const parseRange=function(kRange,pat){
 	if (typeof pat=="undefined") pat=this.addressPattern;
 	if (typeof kRange=="string") {
 		kRange=Ksanapos.parse(kRange,pat);
-		forceRange=true;
 	}
-	const r=Ksanapos.breakKRange(kRange,pat,forceRange);
+	const r=Ksanapos.breakKRange(kRange,pat);
 	
 	const startarr=Ksanapos.unpack(r.start,pat);
 	var endarr=Ksanapos.unpack(r.end,pat);
@@ -145,7 +144,7 @@ const pageOf=function(address){
 const bookLineOf=function(address){ //line counting from this book
 	const r=parseRange(address,this.addressPattern);
 	const arr=kPosUnpack.call(this,r.start);
-	return arr[1]*this.addressPattern.maxline+arr[2];
+	return (arr[1]-1)*this.addressPattern.maxline+(arr[2]-1);
 }
 const lineOf=function(address){
 	const r=parseRange(address,this.addressPattern);

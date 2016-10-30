@@ -48,7 +48,7 @@ var makeKPos=function(nums,pat){
 	kpos+= nums[1]*mul; mul*=Math.pow(2,pat.pagebits);
 	kpos+= nums[0]*mul;
 
-	return kpos+1;
+	return kpos;
 }
 //kstart might be zero if book=0,page=0,line=0,ch=0
 const breakKRange=function(kRange,pat,forceRange){
@@ -64,7 +64,7 @@ const breakKRange=function(kRange,pat,forceRange){
 }
 const makeKRange=function(startkpos,endkpos,pat){
 	if (isNaN(startkpos)||isNaN(endkpos)) {
-		return 1;
+		return 0;
 	}
 	
 	if (startkpos>endkpos) {
@@ -83,7 +83,7 @@ const makeKRange=function(startkpos,endkpos,pat){
 	return startkpos*maxrange+r;
 }
 var unpack=function(kpos,pat){
-	kpos--;
+//	kpos--;
 	var ch=kpos%pat.maxchar;
 	var line=Math.floor((kpos/pat.maxchar)%pat.maxline);
 	var page=Math.floor((kpos/ Math.pow(2,pat.charbits+pat.linebits)) %pat.maxpage);
@@ -94,12 +94,12 @@ var unpack=function(kpos,pat){
 }
 const stringifyKPos=function(kpos,pat){
 	const parts=unpack(kpos,pat);
-	var s= (parts[0]+1)+'p';
+	var s= (parts[0])+'p';
 	if (pat.column){//for taisho
 		s+=Math.floor(parts[1]/pat.column)+1;	
 		s+=String.fromCharCode((parts[1]%pat.column)+0x61);
 	} else {
-		s+=(1+parts[1]);
+		s+=(parts[1]+1);
 		s+='.';
 	}
 	line='0'+(parts[2]+1);
@@ -112,9 +112,9 @@ const stringifyKPos=function(kpos,pat){
 const isRange=function(k,pat){
 	return (k/Math.pow(2,pat.kposbits-1))>1;
 }
-const stringify=function(krange_kpos,pat,forceRange){
-	if (isRange(krange_kpos,pat)||forceRange) {
-		const r=breakKRange(krange_kpos,pat,true);
+const stringify=function(krange_kpos,pat){
+	if (isRange(krange_kpos,pat)) {
+		const r=breakKRange(krange_kpos,pat);
 		var e=stringifyKPos(r.end,pat);
 		var at=e.indexOf("p");
 		e=e.substr(at+1); //remove vol
@@ -145,7 +145,7 @@ const parseLineChar=function(arr,linech){
 	if (linech.length<3) {
 		arr[3]=parseInt(linech,10);//update ch only
 	} else {
-		arr[2]=parseInt(linech.substr(0,2),10)-1;  //first two is line
+		arr[2]=parseInt(linech.substr(0,2),10);  //first two is line
 		arr[3]=parseInt(linech.substr(2,2),10); //ch is one or two byte
 	}
 }
@@ -160,7 +160,7 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 		m=remain.match(regexFollow2); // have column and line and ch
 		if (!m) {
 			m=remain.match(regexFollow3); //only have line and ch
-			if (!m) return start+1;
+			if (!m) return start;
 
 			parseLineChar(arr,m[1]);
 		} else {
@@ -170,7 +170,7 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 			parseLineChar(arr,m[2]);			
 		}
 	} else { //has page, col
-		arr[1]=parseInt(m[1],10)-1; 
+		arr[1]=parseInt(m[1],10); 
 		if (pat.column) {
 			arr[1]=arr[1]*pat.column+(parseInt(m[2],36)-10);
 		}
@@ -191,8 +191,8 @@ const parse=function(address,pat){
 	if (!m) return null;
 	var arr=[0,0,0,0];//book,page,col,line,ch
 	
-	arr[0]=parseInt(m[1],10)-1; 
-	arr[1]=parseInt(m[2],10)-1;
+	arr[0]=parseInt(m[1],10); 
+	arr[1]=parseInt(m[2],10);
 	if (pat.column) {
 		arr[1]=arr[1]*pat.column+(parseInt(m[3],36)-10);
 	}

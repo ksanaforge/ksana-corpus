@@ -19,12 +19,12 @@ const getFieldNames=function(cb){
 }
 
 const makeBookKey=function(s,e,hascol){
-	return ["texts",s[0]];	
+	return ["texts",s[0]-1];	
 }
 
 const makePageKeys=function(s,e,column,maxpage){//without col
 	var keys=[],pg,col;
-	const bk=s[0];
+	const bk=s[0]-1; //only bk start from 1, pg,line,ch starts from 0
 	var endpage=e[1];
 	if (e[0]>s[0]) {//crossing book
 		endpage=maxpage;
@@ -48,6 +48,10 @@ const getPages=function(kRange,cb) {
 	const bookkey=makeBookKey(r.startarr,r.endarr,column);
 
 	this.get(bookkey,function(data){
+		if (!data) {
+			cb([]);
+			return;
+		}
 		const maxpage=data.length;
 		const keys=makePageKeys(r.startarr,r.endarr,column,maxpage);
 		return this.get(keys,{recursive:true},cb);
@@ -127,7 +131,7 @@ const articleOf=function(kRange_address){
 	var start=articlepos[at-1];
 	if (!start) {
 		at=1;
-		start=1;
+		start=articlepos[0];
 	}
 	var end=articlepos[at];
 	if (typeof end=="undefined") end=this.meta.endpos;
