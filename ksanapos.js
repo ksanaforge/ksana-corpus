@@ -145,7 +145,7 @@ const parseLineChar=function(arr,linech){
 	if (linech.length<3) {
 		arr[3]=parseInt(linech,10);//update ch only
 	} else {
-		arr[2]=parseInt(linech.substr(0,2),10);  //first two is line
+		arr[2]=parseInt(linech.substr(0,2),10)-1;  //first two is line
 		arr[3]=parseInt(linech.substr(2,2),10); //ch is one or two byte
 	}
 }
@@ -192,7 +192,7 @@ const parse=function(address,pat){
 	var arr=[0,0,0,0];//book,page,col,line,ch
 	
 	arr[0]=parseInt(m[1],10); 
-	arr[1]=parseInt(m[2],10);
+	arr[1]=parseInt(m[2],10)-1;
 	if (pat.column) {
 		arr[1]=arr[1]*pat.column+(parseInt(m[3],36)-10);
 	}
