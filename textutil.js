@@ -70,7 +70,18 @@ const layoutText=function(text,startkpos,breaks){
 				}
 			} else {
 				lines.push(text[i]);
-				linebreaks.push(kpos);
+				if (text[i].indexOf("\n")>-1) {
+					var count=1;
+					text[i].replace(/\r?\n/g,function(){
+						count++;
+					});
+					while(count>=0) {
+						linebreaks.push(kpos);count--;
+					}
+				} else {
+					linebreaks.push(kpos);
+				}
+				
 			}
 			prevpage=page;
 			kpos=nextkpos;
