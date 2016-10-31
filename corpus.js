@@ -31,13 +31,7 @@ const makePageKeys=function(s,e,column,maxpage){//without col
 	}
 	for (pg=s[1];pg<=endpage;pg++) {
 		if (pg>=maxpage) break;
-		if (column){
-			for (col=0;col<column;col++){
-				keys.push(["texts",bk,pg+col]);
-			}
-		} else {
-			keys.push(["texts",bk,pg]);	
-		}
+		keys.push(["texts",bk,pg]);	
 	}
 	return keys;
 }
