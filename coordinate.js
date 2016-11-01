@@ -59,6 +59,10 @@ const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine){
 		ch-=line.length;
 		++now;
 		line=getRawLine(now-firstline);
+		if (typeof line=="undefined") {
+			console.error("raw line not found",now-firstline);
+			return startkpos;
+		}
 	}
 	t=line.substr(0,ch); //remain text from closest raw line till pos::ch
 	return textutil.advanceLineChar.call(this,startkpos,now-start,t);

@@ -6,13 +6,55 @@ const textutil=require("./textutil");
 const coordinate=require("./coordinate");
 const TOC=require("./toc");
 const getField=function(name,cb){
+	if (typeof name=="object") {
+		return getFields.call(this,name,cb);
+	}
 	return this.get(["fields",name],{recursive:true},cb);
 }
-
+const getFields=function(names,cb){
+	const keys=names.map(function(name){return ["fields",name]});
+	return this.get(keys,{recursive:true},cb);	
+}
 const getBookField=function(name,book,cb){
+	if (typeof name=="object") {
+		return getBookFields.call(this,name,book,cb);
+	}
 	return this.get(["fields",name,book],{recursive:true},cb);	
 }
-
+const getBookFields=function(names,book,cb){
+	const keys=names.map(function(name){return ["fields",name,book]});
+	return this.get(keys,{recursive:true},cb);		
+}
+const trimByArticle=function(article,pos_value){
+	if (!pos_value) return null;
+	var value=[];
+	const hasvalue=typeof pos_value.value!=="undefined";
+	var out={pos:[]};
+	if (hasvalue) out.value=[];
+	for (var i=0;i<pos_value.pos.length;i++) {
+		const p=pos_value.pos[i];
+		if (p>=article.start && p<article.end) {
+			out.pos.push(p);
+			hasvalue&&out.value.push(pos_value.value[i]);
+		}
+	}
+	return out;
+}
+const getArticleField=function(name,narticle,cb){
+	var article=narticle;
+	if (typeof narticle=="number") {
+		article=getArticle(narticle);
+	}
+//TODO , deal with cross book article (should not be)
+	const book=this.bookOf(article.start);
+	this.getBookField(name,book,function(datum){
+		if (typeof name=="string") {
+			datum=[datum];
+		}
+		if (!datum || !datum.length) cb(null);
+		else cb(datum.map(function(data){return trimByArticle(article,data)}));
+	});
+}
 const getFieldNames=function(cb){
 	const r=this.get(["fields"],function(data){return cb(Object.keys(data))});
 	return r?Object.keys(r):[];
@@ -41,62 +83,85 @@ const getPages=function(kRange,cb) {
 	const column=this.addressPattern.column;
 	const bookkey=makeBookKey(r.startarr,r.endarr,column);
 
-	this.get(bookkey,function(data){
+	const fetchpages=function(data){
 		if (!data) {
 			cb([]);
 			return;
 		}
 		const maxpage=data.length;
-		const keys=makePageKeys(r.startarr,r.endarr,column,maxpage);
-		return this.get(keys,{recursive:true},cb);
+		var keys=makePageKeys(r.startarr,r.endarr,column,maxpage);
+		//not calling cb if already in cache
+		var singlekey=false;
+		if (keys.length==1) {
+			singlekey=true;
+			keys=keys[0];
+		}
+		const res=this.get(keys,{recursive:true,syncable:true},function(d2){
+			if (singlekey) cb([d2]);
+			else cb(d2);
+		});
+		return singlekey?[res]:res;
+	}
+
+	const pages=this.get(bookkey,{syncable:true},function(data){
+		fetchpages.call(this,data);
 	}.bind(this));
+
+	if (pages) {
+		return fetchpages.call(this,pages);
+	}
+	return pages;
 }
 const parseRange=function(krange){
 	return textutil.parseRange.call(this,krange,this.addressPattern,true);
 }
+const trimpages=function(kRange,pages,cb){
+	var out=[],i;
+	const r=textutil.parseRange.call(this,kRange,this.addressPattern,true);
+	const pat=this.addressPattern;
+	const startpage=r.startarr[1];
+	var endpage=r.endarr[1];
+	if (r.endarr[0]>r.startarr[0]) {
+		endpage=startpage+pages.length;
+	}
+	for (i=startpage;i<=endpage;i++){
+		if (typeof pages[i-startpage]=="undefined")continue;
+		var pg=JSON.parse(JSON.stringify(pages[i-startpage]));
+		if (i!=endpage){ //fill up array to max page line
+			while (pg.length<pat.maxline) pg.push("");
+		}
+
+		if (i==endpage) {//trim following
+			pg.length=r.endarr[2]+1;
+			pg[pg.length-1]=textutil.trimRight.call(this,pg[pg.length-1],r.endarr[3]);
+		}
+		if (i==startpage) {
+			pg=pg.slice(r.startarr[2]);
+			pg[0]=textutil.trimLeft.call(this,pg[0],r.startarr[3]);
+		}
+		out=out.concat(pg);
+	}
+	cb&&cb(out);
+	return out;
+}
+
 const getText=function(kRange,cb){ //good for excerpt listing
 	//call getPages
 	if (typeof kRange==="object") {
 		return getTexts.call(this,kRange,cb);
 	}
-	const trimpages=function(pages){
-		var out=[],i;
-		const r=textutil.parseRange.call(this,kRange,this.addressPattern,true);
-		const pat=this.addressPattern;
-		const startpage=r.startarr[1];
-		var endpage=r.endarr[1];
-		if (r.endarr[0]>r.startarr[0]) {
-			endpage=startpage+pages.length;
-		}
-		for (i=startpage;i<=endpage;i++){
-			if (typeof pages[i-startpage]=="undefined")continue;
-			var pg=JSON.parse(JSON.stringify(pages[i-startpage]));
-			if (i!=endpage){ //fill up array to max page line
-				while (pg.length<pat.maxline) pg.push("");
-			}
-
-			if (i==endpage) {//trim following
-				pg.length=r.endarr[2]+1;
-				pg[pg.length-1]=textutil.trimRight.call(this,pg[pg.length-1],r.endarr[3]);
-			}
-			if (i==startpage) {
-				pg=pg.slice(r.startarr[2]);
-				pg[0]=textutil.trimLeft.call(this,pg[0],r.startarr[3]);
-			}
-			out=out.concat(pg);
-		}
-		cb&&cb(out);
-		return out;
-	}
-
+	var cbtimer=null;
 	var stockpages=getPages.call(this,kRange,function(pages){
-		setTimeout(
-			function(){trimpages.call(this,pages)}.bind(this),0
-		);
+		cbtimer=setTimeout(function(){
+			trimpages.call(this,kRange,pages,cb);
+		}.bind(this),1);
 	}.bind(this));
+
 	if (typeof stockpages!=="undefined"&&
-		typeof stockpages!=="string") return trimpages(stockpages);
-	//remove extra leading and tailing line	
+		typeof stockpages!=="string") {
+		clearTimeout(cbtimer);
+		return trimpages.call(this,kRange,stockpages,cb);
+	}
 }
 const getArticle=function(at,nav) {
 	const articlepos=this.get(["fields","article","pos"]);
@@ -211,6 +276,7 @@ const init=function(engine){
 	engine.tokenizer=createTokenizer(engine.meta.versions.tokenizer);
 	engine.getField=getField;
 	engine.getBookField=getBookField;
+	engine.getArticleField=getArticleField;
 	engine.trimField=trimField;
 	engine.getFieldNames=getFieldNames;
 	engine.getPages=getPages;

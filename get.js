@@ -5,6 +5,7 @@ var gets=function(paths,opts,cb) { //get many data with one call
 		paths=[paths];
 	}
 	var engine=this, output=[], taskqueue=[];
+	if (opts.syncable) opts.syncable=false;
 
 	var makecb=function(path){
 		return function(data){
@@ -38,6 +39,8 @@ var get=function(path,opts,cb) {
 		cb=opts;
 		opts={recursive:false};
 	}
+	opts=opts||{};
+
 	if (!path) {
 		cb&&cb([null]);
 		return null;
