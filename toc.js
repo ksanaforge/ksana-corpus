@@ -3,6 +3,7 @@ const getTOC=function(){
 }
 const getSubTOC=function(kpos,cb){ //get toc containing kpos
 	const subtoc_range=this.getField("subtoc_range");
+	if (!subtoc_range) return [];
 	var keys=[],out=[];
 	for (var i=0;i<subtoc_range.pos.length;i++) {
 		const start=subtoc_range.pos[i];
