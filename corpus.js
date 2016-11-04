@@ -184,18 +184,33 @@ const articleOf=function(kRange_address){
 		start=articlepos[0];
 	}
 	var end=articlepos[at];
-	if (typeof end=="undefined") end=this.meta.endpos;
 
-	//cross book article, adjust start to begining of end book
-	if (this.bookOf(end)>this.bookOf(start)) {
-		start=Ksanapos.makeKPos([this.bookOf(end),0,0,0],this.addressPattern);
-	}	
-	return {at:at-1, articlename:articlename[at-1], end, start};
+	const r=adjustArticleRange.call(this,start,end);
+
+	return {at:at-1, articlename:articlename[at-1], end:r.end, start:r.start};
 }
 
 const getArticleName=function(id){
 	const articlenames=this.get(["fields","article","value"]);
 	return articlenames[id];
+}
+
+//warning , if no article tag at begining of file.
+//fetching last article of previous file will truncate the upper part
+const adjustArticleRange=function(start,end){
+	const pat=this.addressPattern;
+	if (typeof end=="undefined") end=this.meta.endpos;
+
+	//cross book article, adjust start to begining of end book
+	if (this.bookOf(end)>this.bookOf(start)) {
+		const endbookbegin=Ksanapos.makeKPos([this.bookOf(end),0,0,0],pat);
+		if (endbookbegin==end) { // end at start book
+			end=Ksanapos.makeKPos([this.bookOf(start),pat.maxpage-1,pat.maxline-1,0],pat);
+ 		} else {  //starts from begining of end book
+ 			start=endbookbegin;	
+ 		}		
+	}
+	return {start,end};
 }
 
 const getArticle=function(at,nav) {
@@ -214,12 +229,9 @@ const getArticle=function(at,nav) {
 	if (!start)return null;
 	if (typeof end=="undefined") end=this.meta.endpos;
 
-	//cross book article, adjust start to begining of end book
-	if (this.bookOf(end)>this.bookOf(start)) {
-		start=Ksanapos.makeKPos([this.bookOf(end),0,0,0],this.addressPattern);
-	}
+	const r=adjustArticleRange.call(this,start,end);
 	
-	return {at, articlename:articlename[at], end, start};
+	return {at, articlename:articlename[at], end:r.end, start:r.start};
 }
 
 const getArticleText=function(id_name,cb){
