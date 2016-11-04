@@ -302,6 +302,7 @@ const init=function(engine){
 	engine.articleOf=articleOf;
 	engine.bookOf=textutil.bookOf;
 	engine.pageOf=textutil.pageOf;
+	engine.pageStart=textutil.pageStart;
 	engine.lineOf=textutil.lineOf;
 	engine.charOf=textutil.charOf;
 	engine.getArticle=getArticle;

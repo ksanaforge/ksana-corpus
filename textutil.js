@@ -160,6 +160,14 @@ const charOf=function(address){
 	const arr=kPosUnpack.call(this,r.start);
 	return arr[3];
 }
-
-module.exports={trimLeft,trimRight,parseRange,bookOf,pageOf,lineOf,charOf,
+const pageStart=function(address){//return address of begining of page
+	const r=parseRange(address,this.addressPattern);
+	const arr=kPosUnpack.call(this,r.start);
+	const pat=this.addressPattern;
+	arr[2]=0;
+	arr[3]=0;
+	return Ksanapos.makeKPos(arr,pat);
+}
+module.exports={trimLeft,trimRight,parseRange,
+	bookOf,pageOf,lineOf,charOf,pageStart,
 	bookLineOf,	layoutText,extractKPos,advanceLineChar};
