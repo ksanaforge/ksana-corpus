@@ -26,7 +26,7 @@ const buildMap=function(){
 	map=tokentypemap.split("");
 	Object.freeze(map);
 }
-const getCode2TokenTypeMap=function(code,ver){//now only have one version
+const getCode2TokenTypeMap=function(ver){//now only have one version
 	if (!map.length) buildMap();
 	return map;
 }

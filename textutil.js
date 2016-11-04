@@ -1,6 +1,11 @@
 const Ksanapos=require("./ksanapos");
-const isOpenBracket=function(c){
-	return "︽〈【「〔《『﹁︿﹙﹛〝︵｛".indexOf(c)>-1;
+const tt=require("./tokentypes");
+const TokenTypes=tt.TokenTypes;
+const typemap=tt.getCode2TokenTypeMap();
+
+const isPunc=function(c){
+	const token=typemap[c];
+	return (c===TokenTypes.PUNC || c===TokenTypes.SPACE);
 }
 const trimRight=function(str,chcount,includePunc) {
 	if (!str) return "";
@@ -12,8 +17,7 @@ const trimRight=function(str,chcount,includePunc) {
 	s=s.substr(t);
 	code=s.charCodeAt(0);
 	if (includePunc) {
-		while ((code<0x3400||code>0xdfff)&&
-			!isOpenBracket(s[0])){
+		while (isPunc(code)) {
 			s=s.substr(1);
 			code=s.charCodeAt(0);
 			dis++;
@@ -144,7 +148,7 @@ const pageOf=function(address){
 const bookLineOf=function(address){ //line counting from this book
 	const r=parseRange(address,this.addressPattern);
 	const arr=kPosUnpack.call(this,r.start);
-	return (arr[1]-1)*this.addressPattern.maxline+(arr[2]-1);
+	return arr[1]*this.addressPattern.maxline+arr[2];
 }
 const lineOf=function(address){
 	const r=parseRange(address,this.addressPattern);

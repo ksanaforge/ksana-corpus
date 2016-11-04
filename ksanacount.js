@@ -48,6 +48,27 @@ const cjk_nopunc=function(t){
 	}
 	return r;
 }
+var pali_next=function(t,adv){
+	var r=0,i=0,adv=adv||0,wlen;
+	if (!t)return 0;
+	while (r<adv && i<t.length){
+		code=t.charCodeAt(i);
+		c=t.charCodeAt(i);
+		wlen=0;
+		while (i<t.length&&!isWestern(c)) {
+			i++;
+			c=t.charCodeAt(i);
+		}
+		while (i<t.length&&isWestern(c)) {
+			i++;
+			c=t.charCodeAt(i);
+			wlen++;
+		}
+		if (wlen) r++;
+	}
+	return i;
+}
+
 var cjk_next=function(t,adv){
 	var r=0,i=0,adv=adv||0;
 	if (!t)return 0;
@@ -128,6 +149,8 @@ const getCounter=function(language){
 const getNext=function(language) {
 	if (language==="classical_chinese") {
 		return cjk_next;
+	} else if (language==="pali") {
+		return pali_next;
 	}
 	return cjk_next;	
 }

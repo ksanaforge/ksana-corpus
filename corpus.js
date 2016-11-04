@@ -61,17 +61,18 @@ const getFieldNames=function(cb){
 }
 
 const makeBookKey=function(s,e,hascol){
-	return ["texts",s[0]-1];	
+	return ["texts",e[0]-1];	
 }
 
 const makePageKeys=function(s,e,column,maxpage){//without col
 	var keys=[],pg,col;
-	const bk=s[0]-1; //only bk start from 1, pg,line,ch starts from 0
+	var bk=s[0]-1; //only bk start from 1, pg,line,ch starts from 0
+	var startpage=s[1];
 	var endpage=e[1];
-	if (e[0]>s[0]) {//crossing book
+	if (e[0]>s[0]) {//crossing book, article start at ends of file
 		endpage=maxpage;
 	}
-	for (pg=s[1];pg<=endpage;pg++) {
+	for (pg=startpage;pg<=endpage;pg++) {
 		if (pg>=maxpage) break;
 		keys.push(["texts",bk,pg]);	
 	}
@@ -119,8 +120,9 @@ const trimpages=function(kRange,pages,cb){
 	var out=[],i;
 	const r=textutil.parseRange.call(this,kRange,this.addressPattern,true);
 	const pat=this.addressPattern;
-	const startpage=r.startarr[1];
+	var startpage=r.startarr[1];
 	var endpage=r.endarr[1];
+	const startline=r.startarr[2];
 	if (r.endarr[0]>r.startarr[0]) {
 		endpage=startpage+pages.length;
 	}
@@ -136,7 +138,7 @@ const trimpages=function(kRange,pages,cb){
 			pg[pg.length-1]=textutil.trimRight.call(this,pg[pg.length-1],r.endarr[3]);
 		}
 		if (i==startpage) {
-			pg=pg.slice(r.startarr[2]);
+			pg=pg.slice(startline);
 			pg[0]=textutil.trimLeft.call(this,pg[0],r.startarr[3]);
 		}
 		out=out.concat(pg);
@@ -163,17 +165,6 @@ const getText=function(kRange,cb){ //good for excerpt listing
 		return trimpages.call(this,kRange,stockpages,cb);
 	}
 }
-const getArticle=function(at,nav) {
-	const articlepos=this.get(["fields","article","pos"]);
-	const articlename=this.get(["fields","article","value"]);
-	if (!articlepos) return null;
-	at+=(nav||0);
-	const start=articlepos[at];
-	var end=articlepos[at+1];
-	if (!start)return null;
-	if (typeof end=="undefined") end=this.meta.endpos;
-	return {at, articlename:articlename[at], end, start};
-}
 const articleOf=function(kRange_address){
 	var kRange=kRange_address;
 	const pat=this.addressPattern;
@@ -194,6 +185,11 @@ const articleOf=function(kRange_address){
 	}
 	var end=articlepos[at];
 	if (typeof end=="undefined") end=this.meta.endpos;
+
+	//cross book article, adjust start to begining of end book
+	if (this.bookOf(end)>this.bookOf(start)) {
+		start=Ksanapos.makeKPos([this.bookOf(end),0,0,0],this.addressPattern);
+	}	
 	return {at:at-1, articlename:articlename[at-1], end, start};
 }
 
@@ -201,29 +197,39 @@ const getArticleName=function(id){
 	const articlenames=this.get(["fields","article","value"]);
 	return articlenames[id];
 }
-const getArticleText=function(id_name,cb){
+
+const getArticle=function(at,nav) {
 	const articlepos=this.get(["fields","article","pos"]);
 	const articlename=this.get(["fields","article","value"]);
-	var start,end;
+	if (!articlepos) return null;
+
 	if (typeof id_name==="string") {
-		const at=articlename.indexOf(id_name);
-		start=articlepos[at];
-		end=articlepos[at+1];
-	} else if (typeof id_name==="number"){
-		start=articlepos[id_name];
-		end=articlepos[id_name+1];
+		at=articlename.indexOf(id_name);
 	}
+	if (at<0) return null;
 
-	if (typeof start==="undefined") {
+	at+=(nav||0);
+	var start=articlepos[at];
+	var end=articlepos[at+1];
+	if (!start)return null;
+	if (typeof end=="undefined") end=this.meta.endpos;
+
+	//cross book article, adjust start to begining of end book
+	if (this.bookOf(end)>this.bookOf(start)) {
+		start=Ksanapos.makeKPos([this.bookOf(end),0,0,0],this.addressPattern);
+	}
+	
+	return {at, articlename:articlename[at], end, start};
+}
+
+const getArticleText=function(id_name,cb){
+	const article=getArticle.call(this,id_name);
+	if (!article) {
 		cb(null)
-		return null;
+		return null;		
 	}
 
-	if (typeof end==="undefined"){
-		end=this.meta.endpos;
-	}
-
-	const krange=Ksanapos.makeKRange(start,end,this.addressPattern);
+	var krange=Ksanapos.makeKRange(article.start,article.end,this.addressPattern);
 
 	getText.call(this,krange,cb);
 }
