@@ -3,6 +3,9 @@ const buildAddressPattern=function(b,column){
 	if (charbits*2+linebits*2+pagebits*2+bookbits>53) {
 		throw "address has more than 53 bits";
 	}
+	if (linebits>6 || charbits>6) {
+		throw "max line/char bits is 6";
+	}
 	const maxchar=1<<(charbits);
 	const maxline=1<<(linebits);
 	const maxpage=1<<(pagebits);
