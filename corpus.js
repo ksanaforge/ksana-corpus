@@ -40,21 +40,15 @@ const trimByArticle=function(article,pos_value){
 	}
 	return out;
 }
-const getArticleField=function(name,narticle,cb){
+
+const getArticleField=function(narticle,name,cb){
 	var article=narticle;
 	if (typeof narticle=="number") {
-		article=getArticle(narticle);
+		article=getArticle.call(this,narticle);
 	}
-//TODO , deal with cross book article (should not be)
-	const book=this.bookOf(article.start);
-	this.getBookField(name,book,function(datum){
-		if (typeof name=="string") {
-			datum=[datum];
-		}
-		if (!datum || !datum.length) cb(null);
-		else cb(datum.map(function(data){return trimByArticle(article,data)}));
-	});
+	return this.get(["afields",article.at,name],{recursive:true},cb);
 }
+
 const getFieldNames=function(cb){
 	const r=this.get(["fields"],function(data){return cb(Object.keys(data))});
 	return r?Object.keys(r):[];
@@ -287,7 +281,28 @@ const trimField=function(field,start,end){
 	}
 	return out;
 }
-
+const findAField=function(afield,address,cb){
+	this.getField(afield+"_range",function(data){ 
+    if (!data) {
+    	cb("not afield range")
+    	return;
+    }
+    const at=bsearch(data.pos,address,true);
+    if (at<1) {
+    	cb("address "+address+" not found");
+    	return;
+    }
+    //find corpus address by pbaddress
+    this.getArticleField(at-1,afield,function(data2){
+      const at2=bsearch(data2.value,address);//
+      if (at>0) {
+      	cb(0,data2.pos[at2])
+      } else {
+      	cb("address "+address+" not found in article"+(at-1));
+      }
+    });
+  }.bind(this));
+}
 //get a juan and break by p
 const init=function(engine){
 	engine.addressPattern=Ksanapos.buildAddressPattern(engine.meta.bits,engine.meta.column);
@@ -297,6 +312,7 @@ const init=function(engine){
 	engine.getArticleField=getArticleField;
 	engine.trimField=trimField;
 	engine.getFieldNames=getFieldNames;
+	engine.findAField=findAField;
 	engine.getPages=getPages;
 	engine.getText=getText;
 	engine.articleOf=articleOf;
