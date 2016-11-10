@@ -2,7 +2,6 @@
    provide core interface to make use of ksana corpus
 */
 const JsonRom=require("ksana-jsonrom");
-const platform=require("./platform");
 const Corpus=require("./corpus");
 
 var opening="";
@@ -21,7 +20,7 @@ const createEngine=function(kdb,opts,cb){//preload meta and other fields
 		cb=opts;
 		opts={};
 	}
-	var engine={kdb};
+	var engine={kdb:kdb};
 
 	engine.get=require("./get"); //install first API
 
@@ -91,4 +90,4 @@ const open=function(id,opts,cb){
 	});
 }
 
-module.exports={open,close};
+module.exports={open:open,close:close};

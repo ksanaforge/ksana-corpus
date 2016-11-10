@@ -74,7 +74,7 @@ const tokenize=function(s){
 
 const createTokenizer=function(version){
 	const code2TokenType=tt.getCode2TokenTypeMap(version);
-	return {tokenize, TokenTypes , version, code2TokenType};
+	return {tokenize:tokenize, TokenTypes:TokenTypes , version:version, code2TokenType:code2TokenType};
 }
 
-module.exports={createTokenizer,parseIDS,latest:1};
+module.exports={createTokenizer:createTokenizer,parseIDS:parseIDS,latest:1};

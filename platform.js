@@ -13,7 +13,6 @@ var platform="browser";
 			platform="node";
 		}
 	}
-	return platform;
 })();
 
 module.exports=platform;

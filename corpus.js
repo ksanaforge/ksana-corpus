@@ -25,6 +25,7 @@ const getBookFields=function(names,book,cb){
 	const keys=names.map(function(name){return ["fields",name,book]});
 	return this.get(keys,{recursive:true},cb);		
 }
+/*
 const trimByArticle=function(article,pos_value){
 	if (!pos_value) return null;
 	var value=[];
@@ -40,7 +41,7 @@ const trimByArticle=function(article,pos_value){
 	}
 	return out;
 }
-
+*/
 const getArticleField=function(narticle,name,cb){
 	var article=narticle;
 	if (typeof narticle=="number") {
@@ -59,7 +60,7 @@ const makeBookKey=function(s,e,hascol){
 }
 
 const makePageKeys=function(s,e,column,maxpage){//without col
-	var keys=[],pg,col;
+	var keys=[],pg;
 	var bk=s[0]-1; //only bk start from 1, pg,line,ch starts from 0
 	var startpage=s[1];
 	var endpage=e[1];
@@ -204,7 +205,7 @@ const adjustArticleRange=function(start,end){
  			start=endbookbegin;	
  		}		
 	}
-	return {start,end};
+	return {start:start,end:end};
 }
 
 const getArticle=function(at,nav) {
@@ -225,7 +226,7 @@ const getArticle=function(at,nav) {
 
 	const r=adjustArticleRange.call(this,start,end);
 	
-	return {at, articlename:articlename[at], end:r.end, start:r.start};
+	return {at:at, articlename:articlename[at], end:r.end, start:r.start};
 }
 
 const getArticleText=function(id_name,cb){
@@ -342,4 +343,4 @@ const init=function(engine){
 	engine.cachedTOC=[];
 }
 
-module.exports={init};
+module.exports={init:init};

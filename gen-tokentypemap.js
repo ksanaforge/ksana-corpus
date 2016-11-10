@@ -3,7 +3,7 @@
    a 64K string, value from 0(0x30) to 0x7e
    each allowing up to 78 types.
 */
-const {TokenTypes}=require("./TokenTypes");
+const TokenTypes=require("./TokenTypes").TokenTypes;
 
 const ranges=[
 [[0x3400,0x4EFF],TokenTypes.CJK,"CJK Extension A"],
@@ -66,4 +66,4 @@ if (process.argv[1].indexOf("gen-tokentype")>-1){
 	require("fs").writeFileSync("tokentypemap.js",'module.exports="'+
 		packULE(types.join(""))+'";',"utf8");
 }
-module.exports={TokenTypes};
+module.exports={TokenTypes:TokenTypes};

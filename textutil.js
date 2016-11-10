@@ -1,10 +1,8 @@
 const Ksanapos=require("./ksanapos");
 const tt=require("./tokentypes");
 const TokenTypes=tt.TokenTypes;
-const typemap=tt.getCode2TokenTypeMap();
 
 const isPunc=function(c){
-	const token=typemap[c];
 	return (c===TokenTypes.PUNC || c===TokenTypes.SPACE);
 }
 const trimRight=function(str,chcount,includePunc) {
@@ -84,7 +82,7 @@ const layoutText=function(text,startkpos,breaks){
 			linebreaks.unshift(startkpos);
 			lines.push(linetext);
 		}
-		return {linebreaks,pagebreaks,lines};
+		return {linebreaks:linebreaks,pagebreaks:pagebreaks,lines:lines};
 }
 const extractKPos=function(text){
 	var out={},pat=this.addressPattern,articleOf=this.articleOf.bind(this);
@@ -126,7 +124,7 @@ const parseRange=function(kRange,pat){
 	
 	const startarr=Ksanapos.unpack(r.start,pat);
 	var endarr=Ksanapos.unpack(r.end,pat);
-	return {startarr,endarr,start:r.start,end:r.end,kRange};
+	return {startarr:startarr,endarr:endarr,start:r.start,end:r.end,kRange:kRange};
 }
 
 const kPosUnpack=function(kpos,pat){
@@ -168,6 +166,7 @@ const pageStart=function(address){//return address of begining of page
 	arr[3]=0;
 	return Ksanapos.makeKPos(arr,pat);
 }
-module.exports={trimLeft,trimRight,parseRange,
-	bookOf,pageOf,lineOf,charOf,pageStart,
-	bookLineOf,	layoutText,extractKPos,advanceLineChar};
+module.exports={trimLeft:trimLeft,trimRight:trimRight,parseRange:parseRange,
+	bookOf:bookOf,pageOf:pageOf,lineOf:lineOf,charOf:charOf,pageStart:pageStart,
+	bookLineOf:bookLineOf,	layoutText:layoutText,
+	extractKPos:extractKPos,advanceLineChar:advanceLineChar};

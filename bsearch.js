@@ -28,8 +28,5 @@ var bsearch=function(array,value,near) {
 	if (typeof array[0]=="string") func=indexOfSorted_str;
 	return func(array,value,near);
 }
-var bsearchNear=function(array,value) {
-	return bsearch(array,value,true);
-}
 
 module.exports=bsearch;

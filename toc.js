@@ -37,4 +37,4 @@ const getSubTOC=function(kpos,cb){ //get toc containing kpos
 		cb(out);
 	}.bind(this));
 }
-module.exports={getTOC,getSubTOC};
+module.exports={getTOC:getTOC,getSubTOC:getSubTOC};

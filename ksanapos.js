@@ -14,8 +14,9 @@ const buildAddressPattern=function(b,column){
 	const maxrange=1<<(rangebits);
 	const bits=[bookbits,pagebits,linebits,charbits];
 	const kposbits=bookbits+pagebits+linebits+charbits;
-	return {maxbook,maxpage,maxline,maxchar,maxrange,bits,kposbits,
-					bookbits,pagebits,linebits,charbits,rangebits,column};
+	return {maxbook:maxbook,maxpage:maxpage,maxline:maxline,maxchar:maxchar
+		,maxrange:maxrange,bits:bits,kposbits:kposbits,
+					bookbits:bookbits,pagebits:pagebits,linebits:linebits,charbits:charbits,rangebits:rangebits,column:column};
 }
 var checknums=function(nums,pat){
 	if (nums[3]>=pat.maxchar) {
@@ -60,7 +61,7 @@ const breakKRange=function(kRange,pat,forceRange){
 		var dis=Math.floor(kRange%r);
 		start=Math.floor(kRange/r);
 		end=start+dis;		
-		return {start,end};
+		return {start:start,end:end};
 	} else {
 		return {start:kRange,end:kRange};
 	}
@@ -144,7 +145,6 @@ const stringify=function(krange_kpos,pat){
 
 /* convert human readible address to an integer*/
 const parseLineChar=function(arr,linech){
-	var l=linech.length-2; //last two digit is ch
 	if (linech.length<3) {
 		arr[3]=parseInt(linech,10);//update ch only
 	} else {
@@ -215,5 +215,5 @@ const parse=function(address,pat){
 	
 	return makeKRange(start,end,pat);
 }
-module.exports={parse,buildAddressPattern,makeKPos,
-	makeKRange,breakKRange,unpack,stringify};
+module.exports={parse:parse,buildAddressPattern:buildAddressPattern,makeKPos:makeKPos,
+	makeKRange:makeKRange,breakKRange:breakKRange,unpack:unpack,stringify:stringify};

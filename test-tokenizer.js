@@ -1,5 +1,5 @@
 const assert=require("assert");
-const {tokenize}=require("./tokenizer");
+const tokenize=require("./tokenizer").tokenize;
 
 e=tokenize("中文");
 assert.equal(e.length,2,JSON.stringify(e))

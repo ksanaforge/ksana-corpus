@@ -154,4 +154,4 @@ const getNext=function(language) {
 	}
 	return cjk_next;	
 }
-module.exports={cjk,cjk_nopunc,parseIDS,getCounter,getNext};
+module.exports={cjk:cjk,cjk_nopunc:cjk_nopunc,parseIDS:parseIDS,getCounter:getCounter,getNext:getNext};

@@ -31,4 +31,4 @@ const getCode2TokenTypeMap=function(ver){//now only have one version
 	return map;
 }
 
-module.exports={TokenTypes,getCode2TokenTypeMap};
+module.exports={TokenTypes:TokenTypes,getCode2TokenTypeMap:getCode2TokenTypeMap};

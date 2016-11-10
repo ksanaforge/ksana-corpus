@@ -29,20 +29,19 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,omitpunc) {
 	const loglineKPos=linebreaks[line];//kPos of logical line
 	const eoff  =this.charOf(loglineKPos);
 	const firstline=this.bookLineOf(linebreaks[0]);
-	const linedis=this.bookLineOf(kpos)-firstline;
 	const chardis=getUnicodeCharDis.call(this,firstline,kpos,loglineKPos,getRawLine);
 	const l1=getRawLine(this.bookLineOf(kpos)-firstline);
 	const ch=textutil.trimRight.call(this,l1,this.charOf(kpos),omitpunc).length;
 
 	const paragraphfirstline=getRawLine(this.bookLineOf(loglineKPos)-firstline);
 	const prevcount=textutil.trimRight.call(this,paragraphfirstline,eoff,!omitpunc).length;
-	return {line,ch:ch+chardis-prevcount};
+	return {line:line,ch:ch+chardis-prevcount};
 }
 const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical line
 	var krange=textutil.parseRange.call(this,address);
 	const start=toLogicalPos.call(this,linebreaks,krange.start,getRawLine,true);
 	const end=toLogicalPos.call(this,linebreaks,krange.end,getRawLine);	
-	return {start,end};
+	return {start:start,end:end};
 }
 const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine){
 	const start=this.bookLineOf(startkpos)||0;
@@ -68,4 +67,4 @@ const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine){
 	return textutil.advanceLineChar.call(this,startkpos,now-start,t);
 }
 
-module.exports={toLogicalPos,toLogicalRange,fromLogicalPos};
+module.exports={toLogicalPos:toLogicalPos,toLogicalRange:toLogicalRange,fromLogicalPos:fromLogicalPos};
