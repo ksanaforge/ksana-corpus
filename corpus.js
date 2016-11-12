@@ -25,23 +25,7 @@ const getBookFields=function(names,book,cb){
 	const keys=names.map(function(name){return ["fields",name,book]});
 	return this.get(keys,{recursive:true},cb);		
 }
-/*
-const trimByArticle=function(article,pos_value){
-	if (!pos_value) return null;
-	var value=[];
-	const hasvalue=typeof pos_value.value!=="undefined";
-	var out={pos:[]};
-	if (hasvalue) out.value=[];
-	for (var i=0;i<pos_value.pos.length;i++) {
-		const p=pos_value.pos[i];
-		if (p>=article.start && p<article.end) {
-			out.pos.push(p);
-			hasvalue&&out.value.push(pos_value.value[i]);
-		}
-	}
-	return out;
-}
-*/
+
 const getArticleField=function(narticle,name,cb){
 	var article=narticle;
 	if (typeof narticle=="number") {
@@ -283,23 +267,28 @@ const trimField=function(field,start,end){
 	return out;
 }
 const findAField=function(afield,address,cb){
-	this.getField(afield+"_range",function(data){ 
-    if (!data) {
-    	cb("not afield range")
-    	return;
-    }
-    const at=bsearch(data.pos,address,true);
-    if (at<1) {
-    	cb("address "+address+" not found");
-    	return;
-    }
+	if (!this.meta.invertAField || !this.meta.invertAField[afield]) return;
+
+	this.getField([afield+"_start",afield+"_end"],function(datum){ 
+		const start=datum[0],end=datum[1];
+		var i=0;
+
+		for (i=0;i<start.value.length;i++) {
+			if (address>=start.value[i] && address<=end.value[i]) break;
+		}
+
+		if (i==start.value.length) {
+			cb(0,"address not found");
+			return;
+		}
+
     //find corpus address by pbaddress
-    this.getArticleField(at-1,afield,function(data2){
+    this.getArticleField(i,afield,function(data2){
       const at2=bsearch(data2.value,address);//
-      if (at>0) {
-      	cb(0,data2.pos[at2])
+      if (at2>0) {
+      	cb(0,data2.pos[at2-1])
       } else {
-      	cb("address "+address+" not found in article"+(at-1));
+      	cb("address "+address+" not found in article"+(at));
       }
     });
   }.bind(this));
