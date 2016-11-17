@@ -61,8 +61,20 @@ const open=function(id,opts,cb){
 		cb=opts;
 		opts={};
 	}
+	var timer=0;
+	if (opening) {
+		timer=setInterval(function(){
+			if (!opening) {
+				clearInterval(timer);
+				_open(id,opts,cb);
+			}
+		} ,200);
+	} else {
+		_open(id,opts,cb);
+	}
+}
 
-	if (opening) throw "nested open kdb"+id;
+const _open=function(id,opts,cb){
 
 	var engine=pool[id];
 	if (engine) {
