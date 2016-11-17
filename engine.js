@@ -79,7 +79,7 @@ const open=function(id,opts,cb){
 			new JsonRom.open(fn2,function(err2,kdb2){
 				if (err2) {
 					opening="";
-					cb(err);					
+					cb(err2);
 				} else {
 					prepareEngine(id,kdb2,opts,cb)
 				}
