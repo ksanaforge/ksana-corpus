@@ -45,12 +45,26 @@ var makeKPos=function(nums,pat){
 			return -1;
 		}
 	}
-	if(!checknums(nums,pat))return -1;
+	var checknumerror=false;
+	if(!checknums(nums,pat)) {
+		//auto fix line and char,normally book and page will not exceed
+		checknumerror=true;
+		if (nums[2]>=pat.maxline) {
+			nums[2]=pat.maxline-1;
+		}
+		if (nums[3]>=pat.maxchar) {
+			nums[3]=pat.maxchar-1;
+		}		
+	}
 
 	kpos=nums[3];       mul*=Math.pow(2,pat.charbits);
 	kpos+= nums[2]*mul; mul*=Math.pow(2,pat.linebits);
 	kpos+= nums[1]*mul; mul*=Math.pow(2,pat.pagebits);
 	kpos+= nums[0]*mul;
+
+	if (checknumerror) {
+		console.error("kpos trimmed",stringifyKPos(kpos,pat),nums);
+	}
 
 	return kpos;
 }
