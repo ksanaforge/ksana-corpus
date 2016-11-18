@@ -70,7 +70,7 @@ const open=function(id,opts,cb){
 			}
 		} ,200);
 	} else {
-		_open(id,opts,cb);
+		return _open(id,opts,cb);
 	}
 }
 
@@ -78,7 +78,7 @@ const _open=function(id,opts,cb){
 
 	var engine=pool[id];
 	if (engine) {
-		cb(0,engine);
+		cb&&cb(0,engine);
 		return engine;
 	}
 	var fn=id;

@@ -154,7 +154,7 @@ const articleOf=function(kRange_address){
 
 	const articlepos=this.get(["fields","article","pos"]);
 	const articlename=this.get(["fields","article","value"]);
-	if (!articlepos) return -1;
+	if (!articlepos) return null;
 
 	var at=bsearch(articlepos,range.start+1,true);
 	var start=articlepos[at-1];
