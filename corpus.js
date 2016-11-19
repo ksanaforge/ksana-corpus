@@ -31,7 +31,12 @@ const getArticleField=function(narticle,name,cb){
 	if (typeof narticle=="number") {
 		article=getArticle.call(this,narticle);
 	}
-	return this.get(["afields",article.at,name],{recursive:true},cb);
+	var names=name;
+	if (typeof name=="string") names=[name]
+
+	const keys=names.map(function(n){return ["afields",article.at,n]});
+
+	return this.get(keys,{recursive:true},cb);
 }
 
 const getFieldNames=function(cb){
@@ -222,7 +227,31 @@ const getArticleText=function(id_name,cb){
 
 	var krange=Ksanapos.makeKRange(article.start,article.end,this.addressPattern);
 
-	getText.call(this,krange,cb);
+	return getText.call(this,krange,cb);
+}
+
+const getArticleTextTag=function(id_name,fieldnames,cb){
+	const article=getArticle.call(this,id_name);
+	if (!article) {
+		cb(null)
+		return null;		
+	}
+
+	var krange=Ksanapos.makeKRange(article.start,article.end,this.addressPattern);
+
+	getText.call(this,krange,function(text){
+		if (!text) {
+			cb(null);
+			return null;
+		}
+		getArticleField.call(this,article.at,fieldnames,function(values){
+			var fields={};
+			values.forEach(function(v,idx){
+				fields[fieldnames[idx]]=v;
+			});
+			cb({text,fields});
+		});
+	}.bind(this));
 }
 const getTexts=function(kRanges,cb){
 	if (!kRanges || !kRanges.length) {
@@ -316,6 +345,7 @@ const init=function(engine){
 	engine.makeKRange=makeKRange;
 	engine.parseRange=parseRange;
 	engine.getArticleText=getArticleText;
+	engine.getArticleTextTag=getArticleTextTag;
 	engine.getArticleName=getArticleName;
 	engine.extractKPos=textutil.extractKPos;
 	engine.toLogicalRange=coordinate.toLogicalRange;
