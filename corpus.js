@@ -171,7 +171,8 @@ const articleOf=function(kRange_address){
 
 	const r=adjustArticleRange.call(this,start,end);
 
-	return {at:at-1, articlename:articlename[at-1], end:r.end, start:r.start};
+	return {at:at-1, articlename:articlename[at-1],
+	 start:r.start, startH:this.stringify(r.start),end:r.end,endH:this.stringify(r.end)};
 }
 
 const getArticleName=function(id){
@@ -360,6 +361,7 @@ const init=function(engine){
 	engine.knext=Ksanacount.getNext(engine.meta.language);
 	engine.cachedSubTOC={};
 	engine.cachedTOC=[];
+	engine.cachedPostings={};
 }
 
 module.exports={init:init};

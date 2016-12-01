@@ -32,6 +32,7 @@ const createEngine=function(kdb,opts,cb){//preload meta and other fields
 	var preload=[["meta"]
 	,["fields","article"]
 	,["fields","toc"],["fields","subtoc_range"]
+	,["inverted","tokens"]
 	];
 	opts.preload.forEach(function(p){preload.push(p)});
 
