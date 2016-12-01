@@ -323,6 +323,45 @@ const findAField=function(afield,address,cb){
     });
   }.bind(this));
 }
+const tPos2kPos=function(bk,page_col_line,C,R) { //see inverted.js putLinePos
+       return bk*R + page_col_line*C ;
+}
+const fromTPos=function(tpos,cb){
+       var arr=tpos;
+
+       if (typeof tposs=="number") arr=[tpos];
+       const book2tpos=this.get(["inverted","book2tpos"]);
+       var bookline2tpos={},bookof=[];
+       const C=Math.pow(2,this.addressPattern.charbits);
+       const R=Math.pow(2,this.addressPattern.rangebits);
+       const convert=function(){
+               const out=[];
+               for (var i=0;i<arr.length;i++) {
+                       const line2tpos=bookline2tpos[bookof[i]];
+                       const at=bsearch(line2tpos,arr[i],true)-1;
+                       out.push(tPos2kPos(bookof[i],at,C,R));
+               }
+               return out;
+       }
+
+//get line2tpos of each book                                                                                            +       var keys=[],bookid=[],books={};
+
+       for (var i=0;i<arr.length;i++) {
+               const bk=bsearch(book2tpos,arr[i],true);
+               bookof.push(bk);
+               books[bk]=true;
+       }
+       for (bk in books) {
+               keys.push(["inverted","line2tpos",bk]);
+               bookid.push(bk);
+       }
+       this.get(keys,function(line2tposs){
+               for (var i=0;i<line2tposs.length;i++) {
+                       bookline2tpos[bookid[i]] =line2tposs[i];
+               }
+               cb&&cb(convert());
+       });
+}
 //get a juan and break by p
 const init=function(engine){
 	engine.addressPattern=Ksanapos.buildAddressPattern(engine.meta.bits,engine.meta.column);
@@ -361,6 +400,7 @@ const init=function(engine){
 	engine.knext=Ksanacount.getNext(engine.meta.language);
 	engine.cachedSubTOC={};
 	engine.cachedTOC=[];
+	engine.fromTPos;
 	engine.cachedPostings={};
 }
 
