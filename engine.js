@@ -34,8 +34,10 @@ const createEngine=function(kdb,opts,cb){//preload meta and other fields
 	,["fields","toc"],["fields","subtoc_range"]
 	,["inverted","tokens"]
 	];
-  if (opts.inverted) {
-      preload.push(["inverted","book2tpos"],["inverted","tokens"],["inverted","posting_length"]);
+  if (!opts.textOnly) {
+    preload.push(["inverted","book2tpos"]
+    	,["inverted","tokens"]
+    	,["inverted","posting_length"]);
   }	
 	opts.preload.forEach(function(p){preload.push(p)});
 
