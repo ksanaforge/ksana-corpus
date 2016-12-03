@@ -11,7 +11,9 @@ const prevline=function( kpos, line2tpos, at, adv){
 		} else {
 			at--;
 			while (at&& line2tpos[at]==line2tpos[at-1]) at--;
-			r[2] = at % this.addressPattern.maxline;
+			const newline = at % this.addressPattern.maxline;
+			r[1]--;
+			r[2]=newline;
 		}
 		adv--;
 	}
@@ -47,6 +49,7 @@ const tPos2KPos=function(tposs,extraline,bookline2tpos,bookof){
 	  line2tpos_at=[] , //line with hit
 	  linetpos=[];      //tpos of staring and ending line, for filtering postings
 	for (var i=0;i<tposs.length;i++) {
+
 		const line2tpos=bookline2tpos[bookof[i]];
 		var at=bsearch(line2tpos,tposs[i],true);
 		const endlinetpos=line2tpos[at];
