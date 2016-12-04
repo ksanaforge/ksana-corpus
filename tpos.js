@@ -1,7 +1,7 @@
 /* Token Postion */
 const bsearch=require("./bsearch");
 const Ksanapos=require("./ksanapos");
-
+const TT=require("./tokentypes").TokenTypes;
 const prevline=function( kpos, line2tpos, at, adv){
 	var r=Ksanapos.unpack(kpos,this.addressPattern);
 	while (adv) {
@@ -36,21 +36,31 @@ const nextline=function( kpos,line2tpos, at,adv ){
 	const k=Ksanapos.makeKPos(r,this.addressPattern);
 	return {kpos:k, at:at};
 }
-	const absline2kPos=function(bk,page_col_line,C,R) { //see inverted.js putLinePos
-	  return bk*R + page_col_line*C ;
-	}	
-
-const tPos2KPos=function(tposs,extraline,bookline2tpos,bookof){
-
+const absline2kPos=function(bk,page_col_line,C,R) { //see inverted.js putLinePos
+  return bk*R + page_col_line*C ;
+}	
+const calKCharOffset=function(tokencount,line,removePunc){
+	if (!tokencount) return 0;
+	const tokenized=this.tokenizer.tokenize(line);
+	var i=0;
+	while (i<tokenized.length && tokencount) {
+		tokencount-=twidth(tokenized[i][3],removePunc);
+		i++;
+	}
+	return this.kcount(line.substr(0,tokenized[i][2]));
+}
+const tPos2KPos=function(tposs,extraline,linetext,bookline2tpos,bookof){
 	const C=Math.pow(2,this.addressPattern.charbits);
 	const R=Math.pow(2,this.addressPattern.rangebits);
-
+	const removePunc=!!this.get("meta").removePunc;
 	var kposs=[], 
 	  line2tpos_at=[] , //line with hit
 	  linetpos=[];      //tpos of staring and ending line, for filtering postings
 	for (var i=0;i<tposs.length;i++) {
-
 		const line2tpos=bookline2tpos[bookof[i]];
+		if (!line2tpos) {
+			throw "cannot get bookline2tpos of book"+bookof[i];
+		}
 		var at=bsearch(line2tpos,tposs[i],true);
 		const endlinetpos=line2tpos[at];
 		at--;
@@ -58,12 +68,18 @@ const tPos2KPos=function(tposs,extraline,bookline2tpos,bookof){
 			at--;
 		}
 		line2tpos_at.push([line2tpos,at]);
-		kposs.push(absline2kPos(bookof[i],at,C,R));
+		var kpos=absline2kPos(bookof[i],at,C,R);
+		if (linetext) { //given texts, calculate accurate char offset
+			const tchar=tposs[i]- line2tpos[at];
+			kpos+=calKCharOffset.call(this,tchar, linetext, removePunc);
+		}
+		kposs.push(kpos);
 		linetpos.push([line2tpos[at],endlinetpos]);
 	}
+	var out = {kpos:kposs,linetpos:linetpos};
 
 	if (extraline) { //show extra lines above and under hit line
-		var krange=[];
+		var linekrange=[];
 		linetpos=[]; //reset , get from nextline/prevline
 		for (var i=0;i<kposs.length;i++) {
 			var startlinekpos=kposs[i] , endlinekpos=startlinekpos;
@@ -79,12 +95,12 @@ const tPos2KPos=function(tposs,extraline,bookline2tpos,bookof){
 			}
 			const end=endlinekpos+this.addressPattern.maxchar-1;
 			const r=this.makeKRange(startlinekpos,end);
-			krange.push(r);
+			linekrange.push(r);
 		}
-		return {kpos:kposs,krange:krange,line:extraline,linetpos:linetpos};
-	} else {
-		return {kpos:kposs,linetpos:linetpos};
+		out = {kpos:kposs,linekrange:linekrange,line:extraline,linetpos:linetpos};
 	}
+
+	return out;
 }
 const fromTPos=function(tpos,opts,cb){
 	var arr=tpos;
@@ -93,7 +109,7 @@ const fromTPos=function(tpos,opts,cb){
 		opts={};
 	}
 	opts=opts||{};
-	
+
 	if (typeof tpos=="number") arr=[tpos];
 	const book2tpos=this.get(["inverted","book2tpos"]);
 	var bookline2tpos={},bookof=[];
@@ -110,16 +126,20 @@ const fromTPos=function(tpos,opts,cb){
 	}
 	if (!cb) { //sync version
 		const line2tposs=this.get(keys);//already in cache
+		if (!line2tposs) {
+			console.error("async get fail , tpos",tpos,"keys",keys);
+			return null;
+		}
 		for (var i=0;i<line2tposs.length;i++) {
 			bookline2tpos[bookid[i]] =line2tposs[i];
 		}
-		return tPos2KPos.call(this,arr,opts.line,bookline2tpos,bookof);
+		return tPos2KPos.call(this,arr,opts.line,opts.linetext,bookline2tpos,bookof);
 	} else {
 		this.get(keys,function(line2tposs){
 			for (var i=0;i<line2tposs.length;i++) {
 			  bookline2tpos[bookid[i]] =line2tposs[i];
 			}
-			cb&&cb(tPos2KPos.call(this,arr,opts.line,bookline2tpos,bookof));
+			cb&&cb(tPos2KPos.call(this,arr,opts.line,opts.linetext,bookline2tpos,bookof));
 		}.bind(this));
 	}
 }
@@ -130,9 +150,17 @@ const tPosToKRange=function(tpos,opts,cb){
 		opts={};
 	}
 
-	fromTPos.call(this,tpos,function(kposs){
+	const res=fromTPos.call(this,tpos,opts,function(kposs){
+		cb&&cb(kranges);
+	}.bind(this));
 
-		cb(kranges);
-	}.bind(this))
+	if (!cb) return res;
+}
+/* see ksana-corpus-build putToken how tPos++*/
+const twidth=function(type,removePunc){ //return tpos advancement by token type
+	if (type===TT.SPACE || (type===TT.PUNC && removePunc)) {
+		return 0;
+	}
+	return 1;
 }
 module.exports={fromTPos:fromTPos,tPosToKRange:tPosToKRange}
