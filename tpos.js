@@ -92,7 +92,8 @@ const fromTPos=function(tpos,opts,cb){
 		cb=opts;
 		opts={};
 	}
-
+	opts=opts||{};
+	
 	if (typeof tpos=="number") arr=[tpos];
 	const book2tpos=this.get(["inverted","book2tpos"]);
 	var bookline2tpos={},bookof=[];

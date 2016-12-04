@@ -47,7 +47,12 @@ var get=function(path,opts,cb) {
 	}
 
 	if (typeof cb!="function") {
-		return engine.kdb.get(path,opts);
+		if (typeof path[0] =="object") {
+			return path.map(function(p){
+				return engine.kdb.get(p,opts);	
+			})
+		}
+		else return engine.kdb.get(path,opts);
 	}
 
 	if (typeof path==="string") {
