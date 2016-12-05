@@ -47,6 +47,7 @@ const calKCharOffset=function(tokencount,line,removePunc){
 		tokencount-=twidth(tokenized[i][3],removePunc);
 		i++;
 	}
+	if (!tokenized[i]) return 0;
 	return this.kcount(line.substr(0,tokenized[i][2]));
 }
 const tPos2KPos=function(tposs,extraline,linetext,bookline2tpos,bookof){
