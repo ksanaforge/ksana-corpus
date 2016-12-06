@@ -31,13 +31,15 @@ const createEngine=function(kdb,opts,cb){//preload meta and other fields
 	opts.preload=opts.preload||[]; //user specified preload
 	var preload=[["meta"]
 	,["fields","article"]
-	,["fields","toc"],["fields","subtoc_range"]
-	,["inverted","tokens"]
+	,["fields","toc"],["fields","subtoc_range"],["fields","group"]
 	];
   if (!opts.textOnly) {
     preload.push(["inverted","book2tpos"]
     	,["inverted","tokens"]
-    	,["inverted","posting_length"]);
+    	,["inverted","posting_length"]
+    	,["inverted","groupnames"]
+    	,["inverted","group2tpos"]
+    	);
   }	
 	opts.preload.forEach(function(p){preload.push(p)});
 

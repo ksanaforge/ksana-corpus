@@ -9,7 +9,7 @@ const gettext=require("./gettext");
 const getfield=require("./getfield");
 const tpos=require("./tpos");
 const article=require("./article");
-
+const group=require("./group");
 const parseRange=function(krange){
 	return textutil.parseRange.call(this,krange,this.addressPattern,true);
 }
@@ -61,6 +61,11 @@ const init=function(engine){
 	engine.kcount=Ksanacount.getCounter(engine.meta.language);
 	engine.knext=Ksanacount.getNext(engine.meta.language);
 	engine.tPosToKRange=tpos.tPosToKRange;
+	engine.groupNames=group.groupNames;
+	engine.groupKPoss=group.groupKPoss;
+	engine.groupTPoss=group.groupTPoss;
+	engine.groupKRange=group.KRange;
+	engine.groupTRange=group.TRange;
 	engine.cachedSubTOC={};
 	engine.cachedTOC=[];
 	engine.fromTPos=tpos.fromTPos;
