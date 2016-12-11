@@ -131,6 +131,10 @@ const getArticleTextTag=function(id_name,fieldnames,cb){
 			cb(null);
 			return null;
 		}
+		if (!fieldnames.length) {
+			cb({text});
+			return;
+		}
 		this.getArticleField(article.at,fieldnames,function(values){
 			var fields={};
 			values.forEach(function(v,idx){

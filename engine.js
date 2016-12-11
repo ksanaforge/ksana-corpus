@@ -57,9 +57,9 @@ const prepareEngine=function(id,kdb,opts,cb){
 		else {
 			if (engine&&engine.meta){
 				pool[id]=engine;
-				cb(0,engine);						
+				cb&& cb(0,engine);						
 			} else {
-				cb(id+" is invalid");
+				cb&&cb(id+" is invalid");
 			}
 		} 
 	});
@@ -89,17 +89,18 @@ const _open=function(id,opts,cb){
 		cb&&cb(0,engine);
 		return engine;
 	}
+
 	var fn=id;
 	if (fn.indexOf(".cor")==-1) fn+=".cor";
 	opening=id;
-
+	opts=opts||{};
 	fn2=id+"-corpus/"+fn;
 	new JsonRom.open(fn,function(err,kdb){
 		if (err) {
 			new JsonRom.open(fn2,function(err2,kdb2){
 				if (err2) {
 					opening="";
-					cb(err2);
+					cb&&cb(err2);
 				} else {
 					prepareEngine(id,kdb2,opts,cb)
 				}
