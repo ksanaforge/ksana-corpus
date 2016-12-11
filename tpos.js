@@ -112,6 +112,9 @@ const fromTPos=function(tpos,opts,cb){
 	opts=opts||{};
 
 	if (typeof tpos=="number") arr=[tpos];
+	if (!arr.length) {
+		return {kpos:[]};
+	}
 	const book2tpos=this.get(["inverted","book2tpos"]);
 	var bookline2tpos={},bookof=[];
 	//get line2tpos of each book                                                                                            
@@ -127,9 +130,9 @@ const fromTPos=function(tpos,opts,cb){
 	}
 	if (!cb) { //sync version
 		const line2tposs=this.get(keys);//already in cache
-		if (!line2tposs) {
-			console.error("async get fail , tpos",tpos,"keys",keys);
-			return null;
+		if (!line2tposs || !line2tposs[0]) {
+			//console.error("async get fail , tpos",tpos,"keys",keys);
+			return {kpos:[]};
 		}
 		for (var i=0;i<line2tposs.length;i++) {
 			bookline2tpos[bookid[i]] =line2tposs[i];

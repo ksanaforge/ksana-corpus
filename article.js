@@ -68,7 +68,8 @@ const getArticle=function(at,nav) {
 
 	const r=adjustArticleRange.call(this,start,end);
 	
-	return {at:at, articlename:articlename[at], end:r.end, start:r.start};
+	return {at:at, articlename:articlename[at], end:r.end, start:r.start
+		,startH:this.stringify(r.start),end:r.end,endH:this.stringify(r.end) };
 }
 
 module.exports={getArticle:getArticle,articleOf:articleOf,

@@ -1,3 +1,4 @@
+const bsearch=require("./bsearch");
 const groupNames=function(){
 	return this.get(["fields","group","value"]);
 }
@@ -26,4 +27,31 @@ const groupTRange=function(g){
 	if (!end) return [start,last];
 	return [start,end];
 }
-module.exports={groupNames,groupKPoss,groupTPoss,groupKRange,groupTRange};
+//return group of articles containing address
+const groupArticles=function(address){
+	var kpos;
+	if (typeof address=="number") kpos=address;
+	else {
+		const r=this.parseRange(address);
+		kpos=r.start;		
+	}
+	const kposs=this.groupKPoss.call(this);
+	const at=bsearch(kposs,kpos+10,true)-1;
+
+	const range=this.groupKRange.call(this,at);
+
+	const articlepos=this.get(["fields","article","pos"]);
+	const articlename=this.get(["fields","article","value"]);
+
+	var out=[];
+	for (var i=0;i<articlepos.length;i++) {
+		const vpos=articlepos[i];
+		if (vpos>=range[0] && vpos<range[1]) {
+			out.push(this.getArticle(i));
+		}
+	}
+	return out;
+}
+module.exports={groupNames:groupNames,groupKPoss:groupKPoss,
+groupTPoss:groupTPoss,groupKRange:groupKRange,groupTRange:groupTRange,
+groupArticles:groupArticles};
