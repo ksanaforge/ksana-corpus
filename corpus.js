@@ -49,6 +49,7 @@ const init=function(engine){
 	engine.getArticleText=gettext.getArticleText;
 	engine.getArticleTextTag=gettext.getArticleTextTag;
 	engine.getArticleName=article.getArticleName;
+	engine.articleCount=article.articleCount
 	engine.extractKPos=textutil.extractKPos;
 	engine.toLogicalRange=coordinate.toLogicalRange;
 	engine.toLogicalPos=coordinate.toLogicalPos;

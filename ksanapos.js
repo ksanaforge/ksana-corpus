@@ -128,7 +128,7 @@ const stringifyKPos=function(kpos,pat){
 }
 //not valid if kpos_start==0
 const isRange=function(k,pat){
-	return (k/Math.pow(2,pat.kposbits-1))>1;
+	return (k/Math.pow(2,pat.kposbits))>1;
 }
 const stringify=function(krange_kpos,pat){
 	if (isRange(krange_kpos,pat)) {

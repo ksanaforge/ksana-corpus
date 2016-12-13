@@ -71,6 +71,9 @@ const getArticle=function(at,nav) {
 	return {at:at, articlename:articlename[at], end:r.end, start:r.start
 		,startH:this.stringify(r.start),end:r.end,endH:this.stringify(r.end) };
 }
-
-module.exports={getArticle:getArticle,articleOf:articleOf,
+const articleCount=function(){
+	const articlename=this.get(["fields","article","value"]);
+	return articlename.length;
+}
+module.exports={getArticle:getArticle,articleOf:articleOf,articleCount:articleCount,
 getArticleName:getArticleName,adjustArticleRange:adjustArticleRange}
