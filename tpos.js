@@ -103,6 +103,52 @@ const tPos2KPos=function(tposs,extraline,linetext,bookline2tpos,bookof){
 
 	return out;
 }
+const kPos2TPos=function(kposs,bookline2tpos){
+	var out=[];
+	for (var i=0;i<kposs;i++) {
+		const r=Ksanapos.unpack(kpos,this.addressPattern);
+		const line2tpos=bookline2tpos[r[0]];
+		const absline=r[1]*this.addressPattern.maxline+r[2];
+		out.push( line2tpos[absline]);
+	}
+	return out;
+}
+const toTPos=function(kpos,cb){
+	if (!(kpos instanceof Array)){
+		kpos=[kpos];
+	}
+	
+	var keys=[],bookid=[],books={};
+	for (var i=0;i<kpos.length;i++) {
+		const r=Ksanapos.unpack(kpos,this.addressPattern);
+		const bk=r[0];
+		bookof.push(r[0]);
+		books[bk]=true;
+	}
+	for (bk in books) {
+		keys.push(["inverted","line2tpos",bk]);
+		bookid.push(bk);
+	}
+	var bookline2tpos={};
+	if (!cb) { //sync version
+		const line2tposs=this.get(keys);//already in cache
+		if (!line2tposs) {
+			console.error("async get fail , kpos",kpos,"keys",keys);
+			return null;
+		}
+		for (var i=0;i<line2tposs.length;i++) {
+			bookline2tpos[bookid[i]] =line2tposs[i];
+		}
+		return kPos2TPos.call(this,kpos,bookline2tpos);
+	} else {
+		this.get(keys,function(line2tposs){
+			for (var i=0;i<line2tposs.length;i++) {
+			  bookline2tpos[bookid[i]] =line2tposs[i];
+			}
+			cb&&cb(kPos2TPos.call(this,kpos,bookline2tpos));
+		}.bind(this));
+	}
+}
 const fromTPos=function(tpos,opts,cb){
 	var arr=tpos;
 	if (typeof opts=="function") {
@@ -167,4 +213,4 @@ const twidth=function(type,removePunc){ //return tpos advancement by token type
 	}
 	return 1;
 }
-module.exports={fromTPos:fromTPos,tPosToKRange:tPosToKRange}
+module.exports={fromTPos:fromTPos,tPosToKRange:tPosToKRange,toTPos:toTPos}
