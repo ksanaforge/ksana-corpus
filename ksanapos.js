@@ -202,9 +202,13 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 	return end;
 }
 const regexAddress=/(\d+)p(\d+)([a-z\.])(\d+)/
+const regexAddressShort=/(\d+)p(\d+)([a-z\.])/
 
 const parse=function(address,pat){
 	var m=address.match(regexAddress);
+	if (!m) {
+		m=address.match(regexAddressShort);
+	}
 	if (!m) return null;
 	var arr=[0,0,0,0];//book,page,col,line,ch
 	
@@ -214,8 +218,9 @@ const parse=function(address,pat){
 		arr[1]=arr[1]*pat.column+(parseInt(m[3],36)-10);
 	}
 	
-	parseLineChar(arr,m[4]);
-
+	if (m.length>4){
+		parseLineChar(arr,m[4]);		
+	}
 	var start=makeKPos(arr,pat);
 	var end=start;
 
