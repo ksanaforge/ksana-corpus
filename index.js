@@ -1,6 +1,9 @@
 const Engine=require("./engine");
 const bsearch=require("./bsearch");
+const trimArticleField=require("./article").trimArticleField;
 const openCorpus=function(id,opts,readycb){
 	return Engine.open(id,opts,readycb);
 }
-module.exports={openCorpus:openCorpus,bsearch:bsearch};
+const parseLink=require("./parselink");
+module.exports={openCorpus:openCorpus,bsearch:bsearch,parseLink:parseLink
+,trimArticleField:trimArticleField};

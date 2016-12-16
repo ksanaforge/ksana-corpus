@@ -75,5 +75,11 @@ const articleCount=function(){
 	const articlename=this.get(["fields","article","value"]);
 	return articlename.length;
 }
+
+const trimArticleField=function(allfields,article){
+	const s=bsearch(allfields.pos,article.start,true);
+	const e=bsearch(allfields.pos,article.end,true);
+	return {pos:allfields.pos.slice(s,e+1),value:allfields.value.slice(s,e+1)};
+}
 module.exports={getArticle:getArticle,articleOf:articleOf,articleCount:articleCount,
-getArticleName:getArticleName,adjustArticleRange:adjustArticleRange}
+getArticleName:getArticleName,adjustArticleRange:adjustArticleRange,trimArticleField:trimArticleField}
