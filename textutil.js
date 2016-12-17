@@ -3,7 +3,8 @@ const tt=require("./tokentypes");
 const TokenTypes=tt.TokenTypes;
 
 const isPunc=function(c){
-	return (c===TokenTypes.PUNC || c===TokenTypes.SPACE);
+	const c2tt=this.tokenizer.code2TokenType;
+	return (c2tt[c]===TokenTypes.PUNC || c2tt[c]===TokenTypes.SPACE);
 }
 const trimRight=function(str,chcount,includePunc) {
 	if (!str) return "";
@@ -15,7 +16,7 @@ const trimRight=function(str,chcount,includePunc) {
 	s=s.substr(t);
 	code=s.charCodeAt(0);
 	if (includePunc) {
-		while (isPunc(code)) {
+		while (isPunc.call(this,code)) {
 			s=s.substr(1);
 			code=s.charCodeAt(0);
 			dis++;

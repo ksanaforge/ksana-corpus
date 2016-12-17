@@ -43,13 +43,13 @@ const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical lin
 	const end=toLogicalPos.call(this,linebreaks,krange.end,getRawLine);	
 	return {start:start,end:end};
 }
-const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine){
+const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine,oneline){
 	const start=this.bookLineOf(startkpos)||0;
 	var line=getRawLine(start-firstline);
 	if (!line) return 1;
 	
 	var offset=textutil.trimRight.call(this,line,this.charOf(startkpos),true).length;
-	if ((line.length-offset)>=ch) { //ch is in this line
+	if ((line.length-offset)>=ch || oneline) { //ch is in this line
 		return startkpos+this.kcount(textline.substr(0,ch));
 	}
 	line=line.substr(offset);
