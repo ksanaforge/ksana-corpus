@@ -234,5 +234,10 @@ const parse=function(address,pat){
 	
 	return makeKRange(start,end,pat);
 }
+const bookStartPos=function(kpos,pat){
+	var arr=unpack(kpos,pat);
+	arr[2]=0,arr[3]=0;
+	return makeKPos(arr,pat);
+}
 module.exports={parse:parse,buildAddressPattern:buildAddressPattern,makeKPos:makeKPos,
-	makeKRange:makeKRange,breakKRange:breakKRange,unpack:unpack,stringify:stringify};
+	makeKRange:makeKRange,breakKRange:breakKRange,unpack:unpack,stringify:stringify,bookStartPos:bookStartPos};
