@@ -187,7 +187,7 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 			parseLineChar(arr,m[2]);			
 		}
 	} else { //has page, col
-		arr[1]=parseInt(m[1],10); 
+		arr[1]=parseInt(m[1],10)-1;  //page start from 0
 		if (pat.column) {
 			arr[1]=arr[1]*pat.column+(parseInt(m[2],36)-10);
 		}
