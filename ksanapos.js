@@ -158,9 +158,9 @@ const stringify=function(krange_kpos,pat){
 }
 
 /* convert human readible address to an integer*/
-const parseLineChar=function(arr,linech){
+const parseLineChar=function(arr,linech,remain){
 	if (linech.length<3) {
-		arr[3]=parseInt(linech,10);//update ch only
+		arr[remain?3:2 ]=parseInt(linech,10)- (remain?0:1) ;// if remain part, it is ch, otherwise line
 	} else {
 		arr[2]=parseInt(linech.substr(0,2),10)-1;  //first two is line
 		arr[3]=parseInt(linech.substr(2,2),10); //ch is one or two byte
@@ -179,12 +179,12 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 			m=remain.match(regexFollow3); //only have line and ch
 			if (!m) return start;
 
-			parseLineChar(arr,m[1]);
+			parseLineChar(arr,m[1],true);
 		} else {
 			arr[1]=Math.floor(arr[1]/3);
 			arr[1]=arr[1]*pat.column+(parseInt(m[1],36)-10);
 
-			parseLineChar(arr,m[2]);			
+			parseLineChar(arr,m[2],true);			
 		}
 	} else { //has page, col
 		arr[1]=parseInt(m[1],10)-1;  //page start from 0
@@ -211,7 +211,7 @@ const parse=function(address,pat){
 	}
 	if (!m) return null;
 	var arr=[0,0,0,0];//book,page,col,line,ch
-	
+
 	arr[0]=parseInt(m[1],10); 
 	arr[1]=parseInt(m[2],10)-1;
 	if (pat.column) {
@@ -219,7 +219,7 @@ const parse=function(address,pat){
 	}
 	
 	if (m.length>4){
-		parseLineChar(arr,m[4]);		
+		parseLineChar(arr,m[4]);
 	}
 	var start=makeKPos(arr,pat);
 	var end=start;

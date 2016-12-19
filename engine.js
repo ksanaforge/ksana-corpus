@@ -81,7 +81,10 @@ const open=function(id,opts,cb){
 		return _open(id,opts,cb);
 	}
 }
-
+const isNode=function(){
+	return (typeof process!=="undefined") &&
+	process.versions && process.versions.node;
+}
 const _open=function(id,opts,cb){
 
 	var engine=pool[id];
@@ -94,7 +97,11 @@ const _open=function(id,opts,cb){
 	if (fn.indexOf(".cor")==-1) fn+=".cor";
 	opening=id;
 	opts=opts||{};
-	fn2=id+"-corpus/"+fn;
+	if ((typeof window!=="undefined" && window.node_modules)||isNode()) {
+		fn2="../"+id+"-corpus/"+fn; //for nw
+	} else {
+		fn2=id+"-corpus/"+fn;
+	}
 	new JsonRom.open(fn,function(err,kdb){
 		if (err) {
 			new JsonRom.open(fn2,function(err2,kdb2){
