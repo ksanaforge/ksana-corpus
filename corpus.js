@@ -68,6 +68,7 @@ const init=function(engine){
 	engine.groupKRange=group.groupKRange;
 	engine.groupTRange=group.groupTRange;
 	engine.groupArticles=group.groupArticles;
+	engine.getTitle=group.getTitle;
 	engine.cachedSubTOC={};
 	engine.cachedTOC=[];
 	engine.fromTPos=tpos.fromTPos;

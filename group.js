@@ -52,6 +52,16 @@ const groupArticles=function(address){
 	}
 	return out;
 }
+const getTitle=function(address,sep){
+	const r=this.parseRange(address);
+	const kpos=r.start;
+	const kposs=this.groupKPoss.call(this);
+	const at=bsearch(kposs,kpos+10,true)-1;
+	const groupname=this.groupNames()[at];
+	const article=this.articleOf(address);
+
+	return groupname+(sep||"-")+article.articlename;
+}
 module.exports={groupNames:groupNames,groupKPoss:groupKPoss,
 groupTPoss:groupTPoss,groupKRange:groupKRange,groupTRange:groupTRange,
-groupArticles:groupArticles};
+groupArticles:groupArticles,getTitle:getTitle};

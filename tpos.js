@@ -166,11 +166,11 @@ const fromTPos=function(tpos,opts,cb){
 	//get line2tpos of each book                                                                                            
 	var keys=[],bookid=[],books={};
 	for (var i=0;i<arr.length;i++) {
-		const bk=bsearch(book2tpos,arr[i],true);
+		var bk=bsearch(book2tpos,arr[i],true);
 		bookof.push(bk);
 		books[bk]=true;
 	}
-	for (bk in books) {
+	for (var bk in books) {
 		keys.push(["inverted","line2tpos",bk]);
 		bookid.push(bk);
 	}
