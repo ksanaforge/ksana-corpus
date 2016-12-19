@@ -10,7 +10,7 @@ const prevline=function( kpos, line2tpos, at, adv){
 			at--;
 		} else {
 			at--;
-			while (at&& line2tpos[at]==line2tpos[at-1]) at--;
+			while (at>0&& line2tpos[at]==line2tpos[at-1]) at--;
 			const newline = at % this.addressPattern.maxline;
 			r[1]--;
 			r[2]=newline;
@@ -23,7 +23,7 @@ const prevline=function( kpos, line2tpos, at, adv){
 /* TODO , check next line crossing a book */
 const nextline=function( kpos,line2tpos, at,adv ){
 	var r=Ksanapos.unpack(kpos,this.addressPattern);
-	while (adv) {
+	while (adv>0) {
 		while (at<line2tpos.length-1 && line2tpos[at]==line2tpos[at+1]) {
 			at++;
 		}
@@ -65,9 +65,10 @@ const tPos2KPos=function(tposs,extraline,linetext,bookline2tpos,bookof){
 		var at=bsearch(line2tpos,tposs[i],true);
 		const endlinetpos=line2tpos[at];
 		at--;
-		while (line2tpos[at-1]==line2tpos[at]) { //empty line has same tpos, backward to last line
+		while (at>0&&line2tpos[at-1]==line2tpos[at]) { //empty line has same tpos, backward to last line
 			at--;
 		}
+		if (at<0) continue;
 		line2tpos_at.push([line2tpos,at]);
 		var kpos=absline2kPos(bookof[i],at,C,R);
 		if (linetext) { //given texts, calculate accurate char offset
