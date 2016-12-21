@@ -46,6 +46,7 @@ const trimpages=function(kRange,pages,cb){
 		}
 		out=out.concat(pg);
 	}
+
 	cb&&cb(out);
 	return out;
 }
@@ -125,7 +126,6 @@ const getArticleTextTag=function(id_name,fieldnames,cb){
 	}
 
 	var krange=Ksanapos.makeKRange(article.start,article.end,this.addressPattern);
-
 	getText.call(this,krange,function(text){
 		if (!text) {
 			cb(null);

@@ -52,12 +52,13 @@ const groupArticles=function(address){
 	}
 	return out;
 }
-const getTitle=function(address,sep){
+const getTitle=function(address,sep,shortname){
 	const r=this.parseRange(address);
 	const kpos=r.start;
 	const kposs=this.groupKPoss.call(this);
 	const at=bsearch(kposs,kpos+10,true)-1;
-	const groupname=this.groupNames()[at];
+	if (at<0) return "";
+	const groupname=this.groupNames()[at].replace(shortname?/;.*/:/.*?;/,"");
 	const article=this.articleOf(address);
 
 	return groupname+(sep||"-")+article.articlename;

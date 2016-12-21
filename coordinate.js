@@ -20,7 +20,7 @@ const getUnicodeCharDis=function(firstline,kpos,loglineKPos,getRawLine){
 	return chardis;
 }
 //convert kpos to codemirror line:ch
-const toLogicalPos=function(linebreaks,kpos,getRawLine,omitpunc) {
+const toLogicalPos=function(linebreaks,kpos,getRawLine,omitpunc,omitendingpunc) {
 	if (typeof kpos=="string") {
 		const k=parseRange.call(this,kpos);
 		kpos=k.start;
@@ -35,13 +35,17 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,omitpunc) {
 	const ch=textutil.trimRight.call(this,l1,this.charOf(kpos),omitpunc).length;
 
 	const paragraphfirstline=getRawLine(this.bookLineOf(loglineKPos)-firstline);
-	const prevcount=textutil.trimRight.call(this,paragraphfirstline,eoff,!omitpunc).length;
+	const prevcount=textutil.trimRight.call(this,paragraphfirstline,eoff,omitendingpunc).length;
 	return {line:line,ch:ch+chardis-prevcount};
 }
 const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical line
 	var krange=textutil.parseRange.call(this,address);
-	const start=toLogicalPos.call(this,linebreaks,krange.start,getRawLine,true);
-	const end=toLogicalPos.call(this,linebreaks,krange.end,getRawLine);	
+	var start=toLogicalPos.call(this,linebreaks,krange.start,getRawLine,this.meta.removePunc,false);
+	var end=toLogicalPos.call(this,linebreaks,krange.end,getRawLine,this.meta.removePunc,true);
+	if (krange.start==krange.end) {
+		start=end;
+	}
+
 	return {start:start,end:end};
 }
 const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine,oneline){
@@ -68,4 +72,4 @@ const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine,oneline
 	return textutil.advanceLineChar.call(this,startkpos,now-start,t);
 }
 
-module.exports={toLogicalPos:toLogicalPos,toLogicalRange:toLogicalRange,fromLogicalPos:fromLogicalPos};
+module.exports={toLogicalRange:toLogicalRange,fromLogicalPos:fromLogicalPos};

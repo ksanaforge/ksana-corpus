@@ -82,7 +82,7 @@ const tPos2KPos=function(tposs,extraline,linetext,bookline2tpos,bookof){
 
 	if (extraline) { //show extra lines above and under hit line
 		var linekrange=[];
-		linetpos=[]; //reset , get from nextline/prevline
+		if (extraline>2) linetpos=[]; //reset , get from nextline/prevline
 		for (var i=0;i<kposs.length;i++) {
 			var startlinekpos=kposs[i] , endlinekpos=startlinekpos;
 			const line2tpos=line2tpos_at[i][0], at=line2tpos_at[i][1];
