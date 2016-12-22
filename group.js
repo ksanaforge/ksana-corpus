@@ -52,16 +52,18 @@ const groupArticles=function(address){
 	}
 	return out;
 }
-const getTitle=function(address,sep,shortname){
+const getTitle=function(address,sep){
 	const r=this.parseRange(address);
 	const kpos=r.start;
 	const kposs=this.groupKPoss.call(this);
-	const at=bsearch(kposs,kpos+10,true)-1;
-	if (at<0) return "";
-	const groupname=this.groupNames()[at].replace(shortname?/;.*/:/.*?;/,"");
+	var groupname="";
+	if (kposs) {
+		const at=bsearch(kposs,kpos+10,true)-1;
+		const groupname=this.groupNames()[at]+(sep||"-");
+	}
 	const article=this.articleOf(address);
 
-	return groupname+(sep||"-")+article.articlename;
+	return groupname+article.articlename;
 }
 module.exports={groupNames:groupNames,groupKPoss:groupKPoss,
 groupTPoss:groupTPoss,groupKRange:groupKRange,groupTRange:groupTRange,
