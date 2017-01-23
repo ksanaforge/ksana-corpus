@@ -86,7 +86,6 @@ const isNode=function(){
 	process.versions && process.versions.node;
 }
 const _open=function(id,opts,cb){
-
 	var engine=pool[id];
 	if (engine) {
 		cb&&cb(0,engine);
@@ -95,6 +94,7 @@ const _open=function(id,opts,cb){
 
 	var fn=id;
 	if (fn.indexOf(".cor")==-1) fn+=".cor";
+
 	opening=id;
 	opts=opts||{};
 	if ((typeof window!=="undefined" && window.node_modules)||isNode()) {

@@ -63,12 +63,14 @@ const tPos2KPos=function(tposs,extraline,linetext,bookline2tpos,bookof){
 			throw "cannot get bookline2tpos of book"+bookof[i];
 		}
 		var at=bsearch(line2tpos,tposs[i],true);
-		const endlinetpos=line2tpos[at];
-		at--;
+		if (line2tpos[at]>tposs[i]) at--;
+
+		const endlinetpos=line2tpos[at+1];
 		while (at>0&&line2tpos[at-1]==line2tpos[at]) { //empty line has same tpos, backward to last line
 			at--;
 		}
 		if (at<0) continue;
+
 		line2tpos_at.push([line2tpos,at]);
 		var kpos=absline2kPos(bookof[i],at,C,R);
 		if (linetext) { //given texts, calculate accurate char offset

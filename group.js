@@ -53,18 +53,27 @@ const groupArticles=function(address){
 	return out;
 }
 const getTitle=function(address,sep){
+	const groupname=getGroupName.call(this,address);
+	const article=this.articleOf(address);
+
+	return groupname+(sep||"-")+article.articlename;
+}
+const getGroupName=function(address,shortname){
+	const at=groupOf.call(this,address);
+	groupname=this.groupNames()[at];
+	groupname=shortname?groupname.substr(0,groupname.indexOf(";")):groupname.substr(groupname.indexOf(";")+1)	
+	return groupname;
+}
+const groupOf=function(address){
 	const r=this.parseRange(address);
 	const kpos=r.start;
 	const kposs=this.groupKPoss.call(this);
-	var groupname="";
-	if (kposs) {
-		const at=bsearch(kposs,kpos+10,true)-1;
-		const groupname=this.groupNames()[at]+(sep||"-");
-	}
-	const article=this.articleOf(address);
 
-	return groupname+article.articlename;
+	var groupname="";
+	const at=kposs?bsearch(kposs,kpos+10,true)-1:0;
+	return at;
 }
 module.exports={groupNames:groupNames,groupKPoss:groupKPoss,
 groupTPoss:groupTPoss,groupKRange:groupKRange,groupTRange:groupTRange,
-groupArticles:groupArticles,getTitle:getTitle};
+groupArticles:groupArticles,getTitle:getTitle,getGroupName:getGroupName,
+groupOf:groupOf};
