@@ -15,7 +15,7 @@ const trimRight=function(str,chcount,includePunc) {
 	
 	s=s.substr(t);
 	code=s.charCodeAt(0);
-	if (includePunc) {
+	if (includePunc && chcount) { //
 		while (isPunc.call(this,code)) {
 			s=s.substr(1);
 			code=s.charCodeAt(0);
@@ -33,7 +33,7 @@ const trimLeft=function(str,chcount) {
 	t=this.knext(s,c);
 	dis+=t;
 	s=s.substr(t);
-	while (chcount&&s.charCodeAt(0)<0x3400||s.charCodeAt(0)>0xdfff){
+	while (chcount&&(s.charCodeAt(0)<0x3400||s.charCodeAt(0)>0xdfff)){
 		s=s.substr(1);
 		dis++;
 	}
@@ -169,5 +169,5 @@ const pageStart=function(address){//return address of begining of page
 }
 module.exports={trimLeft:trimLeft,trimRight:trimRight,parseRange:parseRange,
 	bookOf:bookOf,pageOf:pageOf,lineOf:lineOf,charOf:charOf,pageStart:pageStart,
-	bookLineOf:bookLineOf,	layoutText:layoutText,
+	bookLineOf:bookLineOf,	layoutText:layoutText,isPunc:isPunc,
 	extractKPos:extractKPos,advanceLineChar:advanceLineChar};

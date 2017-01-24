@@ -32,11 +32,15 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,omitpunc,omitendingpunc) 
 	const firstline=this.bookLineOf(linebreaks[0]);
 	const chardis=getUnicodeCharDis.call(this,firstline,kpos,loglineKPos,getRawLine);
 	const l1=getRawLine(this.bookLineOf(kpos)-firstline);
-	const ch=textutil.trimRight.call(this,l1,this.charOf(kpos),omitpunc).length;
+	var ch=chardis+textutil.trimRight.call(this,l1,this.charOf(kpos),omitpunc).length;
 
 	const paragraphfirstline=getRawLine(this.bookLineOf(loglineKPos)-firstline);
-	const prevcount=textutil.trimRight.call(this,paragraphfirstline,eoff,omitendingpunc).length;
-	return {line:line,ch:ch+chardis-prevcount};
+	const prevcount=textutil.trimRight.call(this,paragraphfirstline,eoff,omitpunc).length;
+	 
+	if (omitendingpunc) {
+		while (ch&&textutil.isPunc.call(this,l1.charCodeAt(ch-1))) ch--;
+	}
+	return {line:line,ch:ch+chardis};
 }
 const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical line
 	var krange=textutil.parseRange.call(this,address);

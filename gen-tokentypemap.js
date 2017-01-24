@@ -13,6 +13,7 @@ const ranges=[
 	[[0x2f00,0x2fdf],TokenTypes.CJK,"kangxi"],
 	[[0xF900,0xFAFF],TokenTypes.CJK,"CJK compatibility"],
 	[[0x3000,0x303F],TokenTypes.PUNC,"puncuation"],
+	[[0x2000,0x206f],TokenTypes.PUNC,"puncuation"],
 	[[0xff01,0xff08,0xff09,0xff0c,0xff0e,0xff1a,0xff1b,0xff1f
 	,0xff61,0xff64,0xff65],TokenTypes.PUNC,"full width puncuation"],
 	[[0xF900,0xFAFF],TokenTypes.PUNC,"compatibility forms"],

@@ -29,16 +29,18 @@ const trimpages=function(kRange,pages,cb){
 	if (r.endarr[0]>r.startarr[0]) {
 		endpage=startpage+pages.length;
 	}
+
 	for (i=startpage;i<=endpage;i++){
 		if (typeof pages[i-startpage]=="undefined")continue;
 		var pg=JSON.parse(JSON.stringify(pages[i-startpage]));
 		if (i!=endpage){ //fill up array to max page line
 			while (pg.length<pat.maxline) pg.push("");
 		}
+		const removePunc=!!this.get("meta").removePunc;
 
 		if (i==endpage) {//trim following
 			pg.length=r.endarr[2]+1;
-			pg[pg.length-1]=textutil.trimRight.call(this,pg[pg.length-1],r.endarr[3]);
+			pg[pg.length-1]=textutil.trimRight.call(this,pg[pg.length-1],r.endarr[3],removePunc);
 		}
 		if (i==startpage) {
 			pg=pg.slice(startline);
