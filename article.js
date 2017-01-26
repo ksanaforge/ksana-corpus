@@ -36,7 +36,7 @@ const articleOf=function(kRange_address){
 
 	const r=adjustArticleRange.call(this,start,end);
 
-	const tpos=getArticleTPos.call(this,at);
+	const tpos=getArticleTPos.call(this,at-1);
 
 	return {at:at-1, articlename:articlename[at-1],
 		tstart:tpos.start,tend:tpos.end,
@@ -84,8 +84,8 @@ const getArticle=function(at,nav) {
 
 	const r=adjustArticleRange.call(this,start,end);
 	const tpos=getArticleTPos.call(this,at);
-	debugger;
-	return {at:at, articlename:articlename[at], end:r.end, start:r.start
+
+	return {at:at, articlename:articlename[at], end:r.end, start:r.start,
 		tstart:tpos.start,tend:tpos.end
 		,startH:this.stringify(r.start),end:r.end,endH:this.stringify(r.end) };
 }
