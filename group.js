@@ -59,8 +59,10 @@ const getTitle=function(address,sep){
 	return groupname+(sep||"-")+article.articlename;
 }
 const getGroupName=function(address,shortname){
+	const groupNames=this.groupNames();
+	if (!groupNames) return "";
 	const at=groupOf.call(this,address);
-	groupname=this.groupNames()[at];
+	groupname=groupNames[at];
 	groupname=shortname?groupname.substr(0,groupname.indexOf(";")):groupname.substr(groupname.indexOf(";")+1)	
 	return groupname;
 }
