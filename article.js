@@ -1,6 +1,19 @@
 const Ksanapos=require("./ksanapos");
 const bsearch=require("./bsearch");
 
+const getArticleTPos=function(at){
+	const article2tpos=this.get(["inverted","article2tpos"]);
+	var start,end;
+	if (article2tpos) {
+		start=article2tpos[at];
+		if (at>=article2tpos) {
+			end=this.meta.endtpos;
+		} else {
+			end=article2tpos[at+1];
+		}
+	}
+	return {start:start,end:end};
+}
 const articleOf=function(kRange_address){
 	var kRange=kRange_address;
 	const pat=this.addressPattern;
@@ -23,7 +36,10 @@ const articleOf=function(kRange_address){
 
 	const r=adjustArticleRange.call(this,start,end);
 
+	const tpos=getArticleTPos.call(this,at);
+
 	return {at:at-1, articlename:articlename[at-1],
+		tstart:tpos.start,tend:tpos.end,
 	 start:r.start, startH:this.stringify(r.start),end:r.end,endH:this.stringify(r.end)};
 }
 
@@ -67,8 +83,10 @@ const getArticle=function(at,nav) {
 	if (typeof end=="undefined") end=this.meta.endpos;
 
 	const r=adjustArticleRange.call(this,start,end);
-	
+	const tpos=getArticleTPos.call(this,at);
+	debugger;
 	return {at:at, articlename:articlename[at], end:r.end, start:r.start
+		tstart:tpos.start,tend:tpos.end
 		,startH:this.stringify(r.start),end:r.end,endH:this.stringify(r.end) };
 }
 const articleCount=function(){

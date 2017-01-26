@@ -35,6 +35,7 @@ const createEngine=function(kdb,opts,cb){//preload meta and other fields
 	];
   if (!opts.textOnly) {
     preload.push(["inverted","book2tpos"]
+    	,["inverted","article2tpos"]
     	,["inverted","tokens"]
     	,["inverted","posting_length"]
     	,["inverted","groupnames"]
