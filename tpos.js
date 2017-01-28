@@ -50,10 +50,26 @@ const calKCharOffset=function(tokencount,line,removePunc){
 	if (!tokenized[i]) return 0;
 	return this.kcount(line.substr(0,tokenized[i][2]));
 }
-const tPos2KPos=function(tposs,extraline,linetext,bookline2tpos,bookof){
+const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof){
 	const C=Math.pow(2,this.addressPattern.charbits);
 	const R=Math.pow(2,this.addressPattern.rangebits);
 	const removePunc=!!this.get("meta").removePunc;
+
+	const getLine=function(hittpos,line2tpos){
+		if (_linetpos[0] instanceof Array) { //range format , for read text
+			for (var i=0;i<_linetpos.length;i++) {
+				if (hittpos>=_linetpos[i][0] && hittpos<=_linetpos[i][1]) break;
+			}
+		} else { //excerpt format, tpos of each line , including end tpos of last line for trimming posting
+			for (var i=0;i<_linetpos.length;i++) {
+				if (_linetpos[i]>hittpos) break;
+			}
+			if(i) i--;
+		}
+
+		const line=linetext[i]; // the actual line
+		return line;
+	}
 	var kposs=[], 
 	  line2tpos_at=[] , //line with hit
 	  linetpos=[];      //tpos of staring and ending line, for filtering postings
@@ -75,7 +91,8 @@ const tPos2KPos=function(tposs,extraline,linetext,bookline2tpos,bookof){
 		var kpos=absline2kPos(bookof[i],at,C,R);
 		if (linetext) { //given texts, calculate accurate char offset
 			const tchar=tposs[i]- line2tpos[at];
-			kpos+=calKCharOffset.call(this,tchar, linetext, removePunc);
+			const line=(linetext instanceof Array)?getLine(tposs[i],line2tpos):linetext;
+			kpos+=calKCharOffset.call(this,tchar, line, removePunc);
 		}
 		kposs.push(kpos);
 		linetpos.push([line2tpos[at],endlinetpos]);
@@ -95,7 +112,13 @@ const tPos2KPos=function(tposs,extraline,linetext,bookline2tpos,bookof){
 				const e=nextline.call(this,startlinekpos,line2tpos,at,adv );
 				startlinekpos=s.kpos;
 				endlinekpos=e.kpos;
-				linetpos.push([line2tpos[s.at],line2tpos[e.at]]);
+				var ltposs=[];
+				for (var j=s.at;j<=e.at;j++) {
+					if (j>s.at&&line2tpos[j]==line2tpos[j-1]) continue;
+					ltposs.push(line2tpos[j]);
+				}
+				ltposs.push(line2tpos[e.at+1]-1); //for triming posting list
+				linetpos.push(ltposs);
 			}
 			const end=endlinekpos+this.addressPattern.maxchar-1;
 			const r=this.makeKRange(startlinekpos,end);
@@ -186,13 +209,13 @@ const fromTPos=function(tpos,opts,cb){
 		for (var i=0;i<line2tposs.length;i++) {
 			bookline2tpos[bookid[i]] =line2tposs[i];
 		}
-		return tPos2KPos.call(this,arr,opts.line,opts.linetext,bookline2tpos,bookof);
+		return tPos2KPos.call(this,arr,opts.line,opts.linetext,opts.linetpos,bookline2tpos,bookof);
 	} else {
 		this.get(keys,function(line2tposs){
 			for (var i=0;i<line2tposs.length;i++) {
 			  bookline2tpos[bookid[i]] =line2tposs[i];
 			}
-			cb&&cb(tPos2KPos.call(this,arr,opts.line,opts.linetext,bookline2tpos,bookof));
+			cb&&cb(tPos2KPos.call(this,arr,opts.line,opts.linetext,opts.linetpos,bookline2tpos,bookof));
 		}.bind(this));
 	}
 }
