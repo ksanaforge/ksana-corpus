@@ -1,6 +1,32 @@
 const getTOC=function(){
 	return this.getField("toc");
 }
+
+const getGroupTOC=function(group,cb){
+	const r=this.groupKRange(group);
+	const articles=this.getField("article").value;
+	group=parseInt(group)||0;
+		
+	const subtoc_range=this.getField("subtoc_range");
+	var keys=[] ,subtoc_title=[];
+	for (var i=0;i<subtoc_range.value.length;i++) {
+		if (subtoc_range.pos[i]>=r[0] && r[1]>subtoc_range.pos[i]) {
+			subtoc_title.push("0\t"+articles[i]+"\t"+subtoc_range.pos[i].toString(36)); //see ksana-corpus-builder/subtree
+			keys.push(["fields","subtoc","value",i]);
+		}
+	}
+	
+	this.get(keys,function(res){
+		var out=[];
+		var groupname=this.groupNames()[group]
+		groupname=groupname.substr(groupname.indexOf(";")+1);
+		out.push("0\t"+groupname+"\t"+r[0].toString(36));
+		for (var j=0;j<res.length;j++) {
+			out=out.concat(res[j]);
+		}
+		cb(out);
+	}.bind(this))
+}
 const getSubTOC=function(kpos,cb){ //get toc containing kpos
 	const subtoc_range=this.getField("subtoc_range");
 	if (!subtoc_range) return [];
@@ -43,4 +69,4 @@ const getSubTOC=function(kpos,cb){ //get toc containing kpos
 		cb(out);
 	}.bind(this));
 }
-module.exports={getTOC:getTOC,getSubTOC:getSubTOC};
+module.exports={getTOC:getTOC,getSubTOC:getSubTOC,getGroupTOC:getGroupTOC};

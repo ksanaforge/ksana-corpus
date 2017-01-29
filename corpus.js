@@ -24,6 +24,10 @@ const makeKRange=function(kstart,kend){
 	return Ksanapos.makeKRange(kstart,kend,this.addressPattern);
 }
 
+const makeKPos=function(nums){
+	return Ksanapos.makeKPos(nums,this.addressPattern);	
+}
+
 //get a juan and break by p
 const init=function(engine){
 	engine.addressPattern=Ksanapos.buildAddressPattern(engine.meta.bits,engine.meta.column);
@@ -45,6 +49,7 @@ const init=function(engine){
 	engine.charOf=textutil.charOf;
 	engine.stringify=stringify;
 	engine.makeKRange=makeKRange;
+	engine.makeKPos=makeKPos;
 	engine.parseRange=parseRange;
 	engine.getArticleText=gettext.getArticleText;
 	engine.getArticleTextTag=gettext.getArticleTextTag;
@@ -71,6 +76,7 @@ const init=function(engine){
 	engine.getTitle=group.getTitle;
 	engine.getGroupName=group.getGroupName;
 	engine.groupOf=group.groupOf;
+	engine.getGroupTOC=TOC.getGroupTOC;
 	engine.cachedSubTOC={};
 	engine.cachedTOC=[];
 	engine.fromTPos=tpos.fromTPos;
