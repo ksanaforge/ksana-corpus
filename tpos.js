@@ -91,7 +91,7 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 		var kpos=absline2kPos(bookof[i],at,C,R);
 		if (linetext) { //given texts, calculate accurate char offset
 			const tchar=tposs[i]- line2tpos[at];
-			const line=(linetext instanceof Array)?getLine(tposs[i],line2tpos):linetext;
+			const line=((linetext instanceof Array)?getLine(tposs[i],line2tpos):linetext ) ||"";
 			kpos+=calKCharOffset.call(this,tchar, line, removePunc);
 		}
 		kposs.push(kpos);

@@ -71,10 +71,13 @@ const getPages=function(kRange,cb) {
 			singlekey=true;
 			keys=keys[0];
 		}
-		const res=this.get(keys,{recursive:true,syncable:true},function(d2){
+		var cb2=function(d2){
 			if (singlekey) cb([d2]);
 			else cb(d2);
-		});
+		};
+		if (!cb) cb2=null;
+		const res=this.get(keys,{recursive:true,syncable:true},cb2);
+		
 		return singlekey?[res]:res;
 	}
 
@@ -94,11 +97,13 @@ const getText=function(kRange,cb){ //good for excerpt listing
 		return getTexts.call(this,kRange,cb);
 	}
 	var cbtimer=null;
-	var stockpages=getPages.call(this,kRange,function(pages){
+	var cb2=function(pages){
 		cbtimer=setTimeout(function(){
 			trimpages.call(this,kRange,pages,cb);
 		}.bind(this),1);
-	}.bind(this));
+	}.bind(this);
+	if (!cb) cb2=null;
+	var stockpages=getPages.call(this,kRange,cb2);
 
 	if (typeof stockpages!=="undefined"&&
 		typeof stockpages!=="string"&&
