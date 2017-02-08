@@ -81,7 +81,11 @@ var cjk_next=function(t,adv){
 			var c=parseIDS(t.substr(i));
 			r++;
 			i+=c;
-		} else if (code>=0x3400 && code<=0x9fff) {
+		} else if ((code>=0x3400 && code<=0x9fff	)
+			||(code>=0x3040 && code<=0x30FF) //kana
+			||(code>=0xE000 && code<=0xFAFF) //pua && supplement
+			||(code>=0x2e80 && code<=0x2fff) //radicals
+			||(code>=0x3100 && code<=0x31BF)) //bopomofo) {
 			r++;
 		}
 		i++;		
@@ -100,7 +104,11 @@ var cjk=function(t){
 			var c=parseIDS(t.substr(i));
 			r++;
 			i+=c;
-		} else if (code>=0x3400 && code<=0x9fff) {
+		} else if ( (code>=0x3400 && code<=0x9fff)
+			||(code>=0x3040 && code<=0x30FF) //kana
+			||(code>=0xE000 && code<=0xFAFF) //pua && supplement
+			||(code>=0x2e80 && code<=0x2fff) //radicals
+			||(code>=0x3100 && code<=0x31BF)) //bopomofo) {
 			r++;
 		}
 		i++;
