@@ -228,9 +228,10 @@ const parse=function(address,pat){
 	if (at>-1) {
 		remain=address.substr(at+1);
 		end=parseRemain(remain,pat,arr);
-	} else {
-		end+=1;
 	}
+	//} else {
+	//	end+=1;
+	//}
 	
 	return makeKRange(start,end,pat);
 }
