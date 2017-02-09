@@ -60,7 +60,7 @@ const getPages=function(kRange,cb) {
 
 	const fetchpages=function(data){
 		if (!data) {
-			cb([]);
+			cb&&cb([]);
 			return;
 		}
 		const maxpage=data.length;

@@ -3,10 +3,10 @@ const bsearch=require("./bsearch");
 
 const getArticleTPos=function(at){
 	const article2tpos=this.get(["inverted","article2tpos"]);
-	var start,end;
-	if (article2tpos) {
+	var start=0,end=0;
+	if (article2tpos && at>=0 && at<=article2tpos.length) {
 		start=article2tpos[at];
-		if (at>=article2tpos) {
+		if (at>=article2tpos.length) {
 			end=this.meta.endtpos;
 		} else {
 			end=article2tpos[at+1];
@@ -35,12 +35,11 @@ const articleOf=function(kRange_address){
 	var end=articlepos[at];
 
 	const r=adjustArticleRange.call(this,start,end);
-
 	const tpos=getArticleTPos.call(this,at-1);
 
 	return {at:at-1, articlename:articlename[at-1],
-		tstart:tpos.start,tend:tpos.end,
-	 start:r.start, startH:this.stringify(r.start),end:r.end,endH:this.stringify(r.end)};
+		tstart:tpos.start,tend:tpos.end, 
+	 start:r.start,startH:this.stringify(r.start),end:r.end,endH:this.stringify(r.end)};
 }
 
 const getArticleName=function(id){
