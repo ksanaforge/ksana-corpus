@@ -22,25 +22,24 @@ const getUnicodeCharDis=function(firstline,kpos,loglineKPos,getRawLine){
 //convert kpos to codemirror line:ch
 const toLogicalPos=function(linebreaks,kpos,getRawLine,omitpunc,omitendingpunc) {
 	if (typeof kpos=="string") {
-		const k=parseRange.call(this,kpos);
+		const k=textutil.parseRange.call(this,kpos);
 		kpos=k.start;
 	}
-
 	const line=bsearch(linebreaks,kpos+1,true)-1;
 	const loglineKPos=linebreaks[line];//kPos of logical line
 	const eoff  =this.charOf(loglineKPos);
 	const firstline=this.bookLineOf(linebreaks[0]);
 	const chardis=getUnicodeCharDis.call(this,firstline,kpos,loglineKPos,getRawLine);
 	const l1=getRawLine(this.bookLineOf(kpos)-firstline);
-	var ch=chardis+textutil.trimRight.call(this,l1,this.charOf(kpos),omitpunc).length;
-
+	var ch=textutil.trimRight.call(this,l1,this.charOf(kpos),omitpunc).length;
 	const paragraphfirstline=getRawLine(this.bookLineOf(loglineKPos)-firstline);
-	const prevcount=textutil.trimRight.call(this,paragraphfirstline,eoff,omitpunc).length;
 	 
 	if (omitendingpunc) {
 		while (ch&&textutil.isPunc.call(this,l1.charCodeAt(ch-1))) ch--;
 	}
-	return {line:line,ch:ch+chardis};
+	const prevcount=textutil.trimRight.call(this,paragraphfirstline,eoff,omitpunc).length;
+
+	return {line:line,ch:ch+chardis-prevcount};
 }
 const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical line
 	var krange=textutil.parseRange.call(this,address);
