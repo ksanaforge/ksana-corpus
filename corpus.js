@@ -27,6 +27,10 @@ const makeKRange=function(kstart,kend){
 const makeKPos=function(nums){
 	return Ksanapos.makeKPos(nums,this.addressPattern);	
 }
+const isRange=function(range){
+	const rr=textutil.parseRange.call(this,range,this.addressPattern,true);
+	return rr.end>rr.start;
+}
 
 //get a juan and break by p
 const init=function(engine){
@@ -51,6 +55,7 @@ const init=function(engine){
 	engine.makeKRange=makeKRange;
 	engine.makeKPos=makeKPos;
 	engine.parseRange=parseRange;
+	engine.isRange=isRange;
 	engine.getArticleText=gettext.getArticleText;
 	engine.getArticleTextTag=gettext.getArticleTextTag;
 	engine.getArticleName=article.getArticleName;

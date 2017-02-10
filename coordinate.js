@@ -76,4 +76,4 @@ const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine,oneline
 	return textutil.advanceLineChar.call(this,startkpos,now-start,t);
 }
 
-module.exports={toLogicalRange:toLogicalRange,fromLogicalPos:fromLogicalPos};
+module.exports={toLogicalPos:toLogicalPos,toLogicalRange:toLogicalRange,fromLogicalPos:fromLogicalPos};
