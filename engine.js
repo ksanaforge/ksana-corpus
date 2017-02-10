@@ -118,5 +118,7 @@ const _open=function(id,opts,cb){
 		}
 	});
 }
-
-module.exports={open:open,close:close};
+const isBusy=function(){
+	return !!opening;
+}
+module.exports={open:open,close:close,isBusy:isBusy};

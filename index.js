@@ -2,7 +2,24 @@ const Engine=require("./engine");
 const bsearch=require("./bsearch");
 const trimArticleField=require("./article").trimArticleField;
 const openCorpus=function(id,opts,readycb){
-	return Engine.open(id,opts,readycb);
+	if (typeof opts=="function") {
+		readycb=opts;
+		opts={};
+	}
+
+	if (id instanceof Array) {
+		for (var i=0;i<id.length;i++) {
+			Engine.open(id[i],opts);
+		}
+		const opentimer=setInterval(function(){
+			if (!Engine.isBusy()){
+				clearInterval(opentimer);
+				readycb&&readycb();
+			}
+		},100);
+	} else {
+		return Engine.open(id,opts,readycb);
+	}
 }
 const parseLink=require("./parselink");
 module.exports={openCorpus:openCorpus,bsearch:bsearch,parseLink:parseLink
