@@ -3,13 +3,13 @@ const getTOC=function(){
 }
 
 const getGroupTOC=function(group,cb){
+	group=parseInt(group)||0;
 	if (group<0){
 		cb&&cb([]);
 		return;
 	}
 	const r=this.groupKRange(group);
 	const articles=this.getField("article").value;
-	group=parseInt(group)||0;
 		
 	const subtoc_range=this.getField("subtoc_range");
 	var keys=[] ,subtoc_title=[];
