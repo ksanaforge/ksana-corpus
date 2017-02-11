@@ -3,6 +3,10 @@ const getTOC=function(){
 }
 
 const getGroupTOC=function(group,cb){
+	if (group<0){
+		cb&&cb([]);
+		return;
+	}
 	const r=this.groupKRange(group);
 	const articles=this.getField("article").value;
 	group=parseInt(group)||0;
@@ -18,7 +22,12 @@ const getGroupTOC=function(group,cb){
 	
 	this.get(keys,function(res){
 		var out=[];
-		var groupname=this.groupNames()[group]
+		var groupname=this.groupNames()[group];
+		if (!groupname) {
+			debugger;
+			groupname="";
+		}
+
 		groupname=groupname.substr(groupname.indexOf(";")+1);
 		out.push("0\t"+groupname+"\t"+r[0].toString(36));
 		for (var j=0;j<res.length;j++) {
