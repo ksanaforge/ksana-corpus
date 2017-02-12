@@ -15,7 +15,7 @@ const close=function(id) {
 	}
 }
 
-const createEngine=function(kdb,opts,cb){//preload meta and other fields
+const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
 	if (typeof opts=="function") {
 		cb=opts;
 		opts={};
@@ -46,13 +46,14 @@ const createEngine=function(kdb,opts,cb){//preload meta and other fields
 
 	engine.get(preload,{recursive:true},function(res){
 		engine.meta=res[0];
+		engine.id=id;
 		Corpus.init(engine);
 		cb(0,engine);
 	});
 }
 
 const prepareEngine=function(id,kdb,opts,cb){
-	createEngine(kdb,opts,function(err2,engine){
+	createEngine(id,kdb,opts,function(err2,engine){
 		opening="";
 		if (err2) cb(err2);
 		else {
