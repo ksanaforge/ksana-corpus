@@ -62,7 +62,7 @@ const getGroupName=function(address,shortname){
 	const groupNames=this.groupNames();
 	if (!groupNames) return "";
 	const at=groupOf.call(this,address);
-	groupname=groupNames[at];
+	var groupname=groupNames[at]||"";
 	groupname=shortname?groupname.substr(0,groupname.indexOf(";")):groupname.substr(groupname.indexOf(";")+1)	
 	return groupname;
 }
