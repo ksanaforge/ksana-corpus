@@ -202,7 +202,7 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 	return end;
 }
 const regexAddress=/(\d+)p(\d+)([a-z\.])(\d+)/
-const regexAddressShort=/(\d+)p(\d+)([a-z\.])/
+const regexAddressShort=/(\d+)p(\d+)([a-z\.]?)/
 
 const parse=function(address,pat){
 	var m=address.match(regexAddress);
@@ -213,7 +213,7 @@ const parse=function(address,pat){
 	var arr=[0,0,0,0];//book,page,col,line,ch
 
 	arr[0]=parseInt(m[1],10); 
-	arr[1]=parseInt(m[2],10)-1;
+	arr[1]=m[2]?parseInt(m[2],10)-1:0;
 	if (pat.column) {
 		arr[1]=arr[1]*pat.column+(parseInt(m[3],36)-10);
 	}
