@@ -10,8 +10,12 @@ const getGroupTOC=function(group,cb){
 	}
 	const r=this.groupKRange(group);
 	const articles=this.getField("article").value;
-		
+
 	const subtoc_range=this.getField("subtoc_range");
+	if (!subtoc_range) {
+		cb&&cb([]);
+		return;
+	}
 	var keys=[] ,subtoc_title=[];
 	for (var i=0;i<subtoc_range.value.length;i++) {
 		if (subtoc_range.pos[i]>=r[0] && r[1]>subtoc_range.pos[i]) {
