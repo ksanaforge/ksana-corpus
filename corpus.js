@@ -11,7 +11,7 @@ const tpos=require("./tpos");
 const article=require("./article");
 const group=require("./group");
 const parseRange=function(krange){
-	return textutil.parseRange.call(this,krange,this.addressPattern,true);
+	return textutil.parseRange.call(this,krange,this.addressPattern);
 }
 
 const stringify=function(krange_kpos,kend){

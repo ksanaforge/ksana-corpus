@@ -22,5 +22,15 @@ const openCorpus=function(id,opts,readycb){
 	}
 }
 const parseLink=require("./parselink");
+const textutil=require("./textutil");
+
+
+const parseRange=function(str,pat){
+	if (typeof pat=="string") {
+		pat=knownPatterns[pat];
+	}
+	if (!pat)return null;
+	return textutil.parseRange(krange,pat);
+}
 module.exports={openCorpus:openCorpus,bsearch:bsearch,parseLink:parseLink
-,trimArticleField:trimArticleField};
+,trimArticleField:trimArticleField,parseRange:parseRange,knownPatterns:knownPatterns};
