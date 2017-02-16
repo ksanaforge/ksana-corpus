@@ -23,8 +23,8 @@ const openCorpus=function(id,opts,readycb){
 }
 const parseLink=require("./parselink");
 const textutil=require("./textutil");
-
-
+const Ksanapos=require("./ksanapos");
+const knownPatterns=require("./knownpatterns");
 const parseRange=function(str,pat){
 	if (typeof pat=="string") {
 		pat=knownPatterns[pat];
@@ -32,5 +32,13 @@ const parseRange=function(str,pat){
 	if (!pat)return null;
 	return textutil.parseRange(krange,pat);
 }
+const stringifyRange=function(r,pat){
+	if (typeof pat=="string") {
+		pat=knownPatterns[pat];
+	}
+	if (!pat)return "";
+	return Ksanapos.stringify(r,pat);
+}
 module.exports={openCorpus:openCorpus,bsearch:bsearch,parseLink:parseLink
-,trimArticleField:trimArticleField,parseRange:parseRange,knownPatterns:knownPatterns};
+,trimArticleField:trimArticleField,parseRange:parseRange,stringifyRange:stringifyRange,
+knownPatterns:knownPatterns};
