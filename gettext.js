@@ -120,7 +120,7 @@ const getArticleText=function(id_name,cb){
 		return null;		
 	}
 
-	var krange=Ksanapos.makeKRange(article.start,article.end,this.addressPattern);
+	var krange=Ksanapos.makeRange(article.start,article.end,this.addressPattern);
 
 	return getText.call(this,krange,cb);
 }
@@ -132,7 +132,7 @@ const getArticleTextTag=function(id_name,fieldnames,cb){
 		return null;		
 	}
 
-	var krange=Ksanapos.makeKRange(article.start,article.end,this.addressPattern);
+	var krange=Ksanapos.makeRange(article.start,article.end,this.addressPattern);
 	getText.call(this,krange,function(text){
 		if (!text) {
 			cb(null);

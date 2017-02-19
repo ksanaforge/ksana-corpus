@@ -121,7 +121,7 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 				linetpos.push(ltposs);
 			}
 			const end=endlinekpos+this.addressPattern.maxchar-1;
-			const r=this.makeKRange(startlinekpos,end);
+			const r=this.makeRange(startlinekpos,end);
 			linekrange.push(r);
 		}
 		out = {kpos:kposs,linekrange:linekrange,line:extraline,linetpos:linetpos};

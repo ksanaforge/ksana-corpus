@@ -1,0 +1,3 @@
+add KsanaCorpus.parseRange(  , addresspatten|welkonw database)
+
+so that taisho can be parse without corpus instance

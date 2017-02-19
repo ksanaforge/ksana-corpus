@@ -69,18 +69,18 @@ var makeKPos=function(nums,pat){
 	return kpos;
 }
 //kstart might be zero if book=0,page=0,line=0,ch=0
-const breakKRange=function(kRange,pat,forceRange){
-	if (forceRange||isRange(kRange,pat)){
+const breakRange=function(range,pat,forceRange){
+	if (forceRange||isRange(range,pat)){
 		var r=Math.pow(2,pat.rangebits);
-		var dis=Math.floor(kRange%r);
-		start=Math.floor(kRange/r);
+		var dis=Math.floor(range%r);
+		start=Math.floor(range/r);
 		end=start+dis;		
 		return {start:start,end:end};
 	} else {
-		return {start:kRange,end:kRange};
+		return {start:range,end:range};
 	}
 }
-const makeKRange=function(startkpos,endkpos,pat){
+const makeRange=function(startkpos,endkpos,pat){
 	if (isNaN(startkpos)||isNaN(endkpos)) {
 		return 0;
 	}
@@ -132,7 +132,7 @@ const isRange=function(k,pat){
 }
 const stringify=function(krange_kpos,pat){
 	if (isRange(krange_kpos,pat)) {
-		const r=breakKRange(krange_kpos,pat);
+		const r=breakRange(krange_kpos,pat);
 		var e=stringifyKPos(r.end,pat);
 		var at=e.indexOf("p");
 		e=e.substr(at+1); //remove vol
@@ -234,12 +234,12 @@ const parse=function(address,pat){
 	//	end+=1;
 	//}
 	
-	return makeKRange(start,end,pat);
+	return makeRange(start,end,pat);
 }
 const bookStartPos=function(kpos,pat){
 	var arr=unpack(kpos,pat);
 	arr[2]=0,arr[3]=0;
 	return makeKPos(arr,pat);
 }
-module.exports={parse:parse,buildAddressPattern:buildAddressPattern,makeKPos:makeKPos,
-	makeKRange:makeKRange,breakKRange:breakKRange,unpack:unpack,stringify:stringify,bookStartPos:bookStartPos};
+module.exports={parse:parse,buildAddressPattern:buildAddressPattern,makeKPos:makeKPos,isRange:isRange,
+	makeRange:makeRange,breakRange:breakRange,unpack:unpack,stringify:stringify,bookStartPos:bookStartPos};

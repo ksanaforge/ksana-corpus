@@ -20,7 +20,7 @@ const articleOf=function(kRange_address){
 	if (typeof kRange_address=="string") {
 		kRange=Ksanapos.parse(kRange_address,pat);
 	}
-	const range=Ksanapos.breakKRange(kRange,pat);
+	const range=Ksanapos.breakRange(kRange,pat);
 
 	const articlepos=this.get(["fields","article","pos"]);
 	const articlename=this.get(["fields","article","value"]);

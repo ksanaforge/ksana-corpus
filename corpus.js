@@ -16,20 +16,23 @@ const parseRange=function(krange){
 
 const stringify=function(krange_kpos,kend){
 	const pat=this.addressPattern;
-	if (kend) return Ksanapos.stringify(Ksanapos.makeKRange(krange_kpos,kend,pat),pat,true);
+	if (kend) return Ksanapos.stringify(Ksanapos.makeRange(krange_kpos,kend,pat),pat,true);
 	return Ksanapos.stringify(krange_kpos,pat);
 }
 
-const makeKRange=function(kstart,kend){
-	return Ksanapos.makeKRange(kstart,kend,this.addressPattern);
+const makeRange=function(kstart,kend){
+	return Ksanapos.makeRange(kstart,kend,this.addressPattern);
 }
 
 const makeKPos=function(nums){
 	return Ksanapos.makeKPos(nums,this.addressPattern);	
 }
 const isRange=function(range){
-	const rr=textutil.parseRange.call(this,range,this.addressPattern,true);
-	return rr.end>rr.start;
+	if (typeof range=="number"){
+		return Ksanapos.isRange(range,this.addressPattern);
+	} else {
+		return Ksanapos.isRange(Ksanapos.parse(range,pat),this.addressPattern);
+	}
 }
 
 //get a juan and break by p
@@ -52,7 +55,7 @@ const init=function(engine){
 	engine.lineOf=textutil.lineOf;
 	engine.charOf=textutil.charOf;
 	engine.stringify=stringify;
-	engine.makeKRange=makeKRange;
+	engine.makeRange=makeRange;
 	engine.makeKPos=makeKPos;
 	engine.parseRange=parseRange;
 	engine.isRange=isRange;

@@ -88,12 +88,12 @@ const layoutText=function(text,startkpos,breaks){
 const extractKPos=function(text){
 	var out={},pat=this.addressPattern,articleOf=this.articleOf.bind(this);
 	text.replace(this.addressRegex,function(m,m1){
-		const kRange=Ksanapos.parse(m1,pat);
-		if (typeof kRange!=="undefined") {
-			var f=articleOf(kRange);
+		const range=Ksanapos.parse(m1,pat);
+		if (typeof range!=="undefined") {
+			var f=articleOf(range);
 			if (!f.articlename) return;
 			if (!out[f.articlename]) out[f.articlename]=[];
-			out[f.articlename].push(kRange);
+			out[f.articlename].push(range);
 		}
 	});
 	return out;
@@ -116,16 +116,16 @@ const advanceLineChar=function(kpos,advline,linetext){
 		return kpos;
 	}
 }
-const parseRange=function(kRange,pat){
+const parseRange=function(range,pat){
 	if (typeof pat=="undefined") pat=this.addressPattern;
-	if (typeof kRange=="string") {
-		kRange=Ksanapos.parse(kRange,pat);
+	if (typeof range=="string") {
+		range=Ksanapos.parse(range,pat);
 	}
-	const r=Ksanapos.breakKRange(kRange,pat);
+	const r=Ksanapos.breakRange(range,pat);
 	
 	const startarr=Ksanapos.unpack(r.start,pat);
 	var endarr=Ksanapos.unpack(r.end,pat);
-	return {startarr:startarr,endarr:endarr,start:r.start,end:r.end,kRange:kRange};
+	return {startarr:startarr,endarr:endarr,start:r.start,end:r.end,range:range};
 }
 
 const kPosUnpack=function(kpos,pat){
