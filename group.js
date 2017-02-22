@@ -6,7 +6,7 @@ const groupKPoss=function(){
 	return this.get(["fields","group","pos"]);
 }
 const groupTPoss=function(){
-	return this.get(["inverted","group2tpos"]);
+	return this.get(["inverted","group2tpos"])||[];
 }
 
 const groupKRange=function(g){
