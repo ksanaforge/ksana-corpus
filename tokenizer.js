@@ -20,7 +20,7 @@ each token
 const tokenize=function(s){
 	const c2tt=this.code2TokenType;
 
-	var i=0,out=[],tk;
+	var i=0,out=[],tk,unknown=false;
 	while (i<s.length) {
 		tk="";
 		var type=c2tt[s.charCodeAt(i)];
@@ -54,7 +54,7 @@ const tokenize=function(s){
 			}
 			out[out.length-1][0]=tk;
 		} else {
-			i++;//unknown
+			unknown=true;
 		}
 		
 		if (type===TokenTypes.SPACE)	{
@@ -66,7 +66,7 @@ const tokenize=function(s){
 				var type=c2tt[code];
 				if (type!==TokenTypes.SPACE) break;
 			}
-		}
+		} else if (unknown) i++;
 		out.length&&(out[out.length-1][1]=tk);//token with tailing spaces
 	}
 	return out;
