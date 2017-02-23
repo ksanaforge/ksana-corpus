@@ -6,6 +6,9 @@ const isPunc=function(c){
 	const c2tt=this.tokenizer.code2TokenType;
 	return (c2tt[c]===TokenTypes.PUNC || c2tt[c]===TokenTypes.SPACE);
 }
+const openbracket=function(s){
+	return s=='「'||s=='《'||s=='『'||s=='（';
+}
 const trimRight=function(str,chcount,includePunc) {
 	if (!str) return "";
 	var c=chcount,dis=0,t,s=str,code;
@@ -16,7 +19,7 @@ const trimRight=function(str,chcount,includePunc) {
 	s=s.substr(t);
 	code=s.charCodeAt(0);
 	if (includePunc && chcount) { //
-		while (isPunc.call(this,code)) {
+		while (isPunc.call(this,code) && !openbracket(s[0])) {
 			s=s.substr(1);
 			code=s.charCodeAt(0);
 			dis++;
