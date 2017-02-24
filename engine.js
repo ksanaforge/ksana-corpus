@@ -94,7 +94,7 @@ const _open=function(id,opts,cb){
 		return engine;
 	}
 
-	var fn=id;
+	var fn=id,fn2;
 	if (fn.indexOf(".cor")==-1) fn+=".cor";
 
 	opening=id;
@@ -102,7 +102,9 @@ const _open=function(id,opts,cb){
 	if ((typeof window!=="undefined" && window.node_modules)||isNode()) {
 		fn2="../"+id+"-corpus/"+fn; //for nw
 	} else {
-		fn2=id+"-corpus/"+fn;
+		const ofn=fn;
+		fn=id+"-corpus/"+fn;
+		fn2=ofn;//web mode try xxx-corpus first, to avoid http warning message
 	}
 	new JsonRom.open(fn,function(err,kdb){
 		if (err) {
@@ -113,7 +115,7 @@ const _open=function(id,opts,cb){
 				} else {
 					prepareEngine(id,kdb2,opts,cb)
 				}
-			});
+			})
 		} else {
 			prepareEngine(id,kdb,opts,cb)
 		}
