@@ -106,7 +106,7 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 			var startlinekpos=kposs[i] , endlinekpos=startlinekpos;
 			const line2tpos=line2tpos_at[i][0], at=line2tpos_at[i][1];
 			if (extraline>2) {
-				const adv=Math.floor((extraline-1)/2);
+				var adv=Math.floor((extraline-1)/2);
 				if (adv>2) adv=2;
 				const s=prevline.call(this,startlinekpos,line2tpos,at,adv );
 				const e=nextline.call(this,startlinekpos,line2tpos,at,adv );
