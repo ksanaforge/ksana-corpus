@@ -38,7 +38,6 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
     	,["inverted","article2tpos"]
     	,["inverted","tokens"]
     	,["inverted","posting_length"]
-    	,["inverted","groupnames"]
     	,["inverted","group2tpos"]
     	);
   }	
