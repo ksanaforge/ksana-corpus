@@ -46,6 +46,9 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
 
 	engine.get(preload,{recursive:true},function(res){
 		engine.meta=res[0];
+		if (!engine.meta.displayOptions) {
+			engine.meta.displayOptions={};
+		}
 		engine.id=id;
 		Corpus.init(engine);
 		cb(0,engine);
