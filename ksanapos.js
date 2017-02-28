@@ -3,8 +3,9 @@ const buildAddressPattern=function(b,column){
 	if (charbits*2+linebits*2+pagebits*2+bookbits>53) {
 		throw "address has more than 53 bits";
 	}
-	if (linebits>6 || charbits>6) {
-		throw "max line/char bits is 6";
+	if (linebits>6 || charbits>8) {
+		console.log(linebits,charbits)
+		throw "max line/char bits is 6 and 8";
 	}
 	const maxchar=1<<(charbits);
 	const maxline=1<<(linebits);
@@ -122,7 +123,11 @@ const stringifyKPos=function(kpos,pat){
 	}
 	line='0'+(parts[2]+1);
 	s+=line.substr(line.length-2);
-	ch='0'+(parts[3]);
+	if (pat.charbits>6) {
+		ch='0'+ (parts[3]).toString(16).toUpperCase();
+	} else {
+		ch='0'+ (parts[3]);
+	}
 	s+=ch.substr(ch.length-2);
 	return s;
 }
@@ -158,17 +163,21 @@ const stringify=function(krange_kpos,pat){
 }
 
 /* convert human readible address to an integer*/
-const parseLineChar=function(arr,linech,remain){
+const parseLineChar=function(arr,linech,remain,pat){
 	if (linech.length<3) {
-		arr[remain?3:2 ]=parseInt(linech,10)- (remain?0:1) ;// if remain part, it is ch, otherwise line
+		var base=10;
+		if (remain &&pat.charbits >6 ){
+			base=16;
+		}
+		arr[remain?3:2]=parseInt(linech,base)- (remain?0:1) ;// if remain part, it is ch, otherwise line
 	} else {
 		arr[2]=parseInt(linech.substr(0,2),10)-1;  //first two is line
-		arr[3]=parseInt(linech.substr(2,2),10); //ch is one or two byte
+		arr[3]=parseInt(linech.substr(2,2),pat.charbits>6?16:10); //ch is one or two byte
 	}
 }
-const regexFollow1=/(\d+)([a-z\.])(\d+)/
-const regexFollow2=/([a-z])(\d+)/
-const regexFollow3=/(\d+)/
+const regexFollow1=/(\d+)([a-d\.])([A-F]\d+)/
+const regexFollow2=/([a-d])([A-F]\d+)/
+const regexFollow3=/([A-F]\d+)/
 const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 	var m=remain.match(regexFollow1);
 	var start=makeKPos(arr,pat);
@@ -179,19 +188,19 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 			m=remain.match(regexFollow3); //only have line and ch
 			if (!m) return start;
 
-			parseLineChar(arr,m[1],true);
+			parseLineChar(arr,m[1],true,pat);
 		} else {
 			arr[1]=Math.floor(arr[1]/3);
 			arr[1]=arr[1]*pat.column+(parseInt(m[1],36)-10);
 
-			parseLineChar(arr,m[2],true);			
+			parseLineChar(arr,m[2],true,pat);
 		}
 	} else { //has page, col
 		arr[1]=parseInt(m[1],10)-1;  //page start from 0
 		if (pat.column) {
 			arr[1]=arr[1]*pat.column+(parseInt(m[2],36)-10);
 		}
-		parseLineChar(arr,m[3]);
+		parseLineChar(arr,m[3],false,pat);
 	}
 
 	var end=makeKPos(arr,pat);
@@ -201,8 +210,8 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 	}
 	return end;
 }
-const regexAddress=/(\d+)p(\d+)([a-z\.])(\d+)/
-const regexAddressShort=/(\d+)p(\d+)([a-f\.]?)/
+const regexAddress=/(\d+)p(\d+)([a-d\.])([A-F\d]+)/
+const regexAddressShort=/(\d+)p(\d+)([a-d]?)/
 
 const parse=function(address,pat){
 	var m=address.match(regexAddress);
@@ -220,7 +229,7 @@ const parse=function(address,pat){
 	}
 	
 	if (m.length>4){
-		parseLineChar(arr,m[4]);
+		parseLineChar(arr,m[4],false,pat);
 	}
 	var start=makeKPos(arr,pat);
 	var end=start;
