@@ -7,7 +7,7 @@ const isPunc=function(c){
 	return (c2tt[c]===TokenTypes.PUNC || c2tt[c]===TokenTypes.SPACE);
 }
 const openbracket=function(s){
-	return s=='「'||s=='《'||s=='『'||s=='（';
+	return s=='「'||s=='《'||s=='『'||s=='（'||s=='〔'||s=='【'||s=='〈';
 }
 const trimRight=function(str,chcount,includePunc) {
 	if (!str) return "";
