@@ -175,9 +175,9 @@ const parseLineChar=function(arr,linech,remain,pat){
 		arr[3]=parseInt(linech.substr(2,2),pat.charbits>6?16:10); //ch is one or two byte
 	}
 }
-const regexFollow1=/(\d+)([a-d\.])([A-F]\d+)/
-const regexFollow2=/([a-d])([A-F]\d+)/
-const regexFollow3=/([A-F]\d+)/
+const regexFollow1=/(\d+)([a-d\.])([A-F\d]+)/
+const regexFollow2=/([a-d])([A-F\d]+)/
+const regexFollow3=/([A-F\d]+)/
 const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 	var m=remain.match(regexFollow1);
 	var start=makeKPos(arr,pat);
