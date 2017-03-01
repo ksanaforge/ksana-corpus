@@ -55,7 +55,6 @@ const tokenize=function(s){
 			out[out.length-1][0]=tk;
 		} else {
 			type=TokenTypes.SPACE;
-			debugger
 		}
 		
 		if (type===TokenTypes.SPACE)	{
