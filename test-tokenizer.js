@@ -1,8 +1,15 @@
 const assert=require("assert");
 const tokenizer=require("./tokenizer").createTokenizer();
+var e;
+
+e=tokenizer.tokenize("　　　　　　　┌發心菩提─┐");
+assert.equal(e.length,4,JSON.stringify(e))
+
+console.log(JSON.stringify(e))
+
 
 e=tokenizer.tokenize("༼ཁ༽ ༄༅། ༈ །འདུལ་བ་ལུང་བཞུགས་སོ། །律師戒行經第二部")
-console.log(JSON.stringify(e))
+
 
 e=tokenizer.tokenize("中文");
 assert.equal(e.length,2,JSON.stringify(e))

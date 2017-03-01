@@ -54,7 +54,8 @@ const tokenize=function(s){
 			}
 			out[out.length-1][0]=tk;
 		} else {
-			unknown=true;
+			type=TokenTypes.SPACE;
+			debugger
 		}
 		
 		if (type===TokenTypes.SPACE)	{
@@ -66,7 +67,7 @@ const tokenize=function(s){
 				var type=c2tt[code];
 				if (type!==TokenTypes.SPACE) break;
 			}
-		} else if (unknown) i++;
+		}
 		out.length&&(out[out.length-1][1]=tk);//token with tailing spaces
 	}
 	return out;
