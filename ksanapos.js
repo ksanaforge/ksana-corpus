@@ -1,10 +1,24 @@
+var log=function(){
+	var args = Array.prototype.slice.call(arguments);
+	if (args[0]=="error") {
+		args.shift();
+		console.error.apply(null,args);
+	} else if (args[0]=="warn") {
+		console.warn.apply(null,args);
+	} else {
+		console.log.apply(null,args);
+	}
+}
+const setLog=function(_log){
+	log=_log;
+}
 const buildAddressPattern=function(b,column){
 	const bookbits=b[0],pagebits=b[1],linebits=b[2], charbits=b[3];
 	if (charbits*2+linebits*2+pagebits*2+bookbits>53) {
 		throw "address has more than 53 bits";
 	}
 	if (linebits>6 || charbits>8) {
-		console.log(linebits,charbits)
+		log("error",linebits,charbits)
 		throw "max line/char bits is 6 and 8";
 	}
 	const maxchar=1<<(charbits);
@@ -21,19 +35,19 @@ const buildAddressPattern=function(b,column){
 }
 var checknums=function(nums,pat){
 	if (nums[3]>=pat.maxchar) {
-		console.error(nums[3],"exceed maxchar",pat.maxchar)
+		//console.error(nums[3],"exceed maxchar",pat.maxchar)
 		return 0;
 	}
 	if (nums[2]>=pat.maxline) {
-		console.error(nums[2],"exceed maxline",pat.maxline)
+		//console.error(nums[2],"exceed maxline",pat.maxline)
 		return 0;
 	}
 	if (nums[1]>=pat.maxpage) {
-		console.error(nums[1],"exceed maxpage",pat.maxpage)
+		//console.error(nums[1],"exceed maxpage",pat.maxpage)
 		return 0;
 	}
 	if (nums[0]>=pat.maxbook) {
-		console.error(nums[0],"exceed maxbook",pat.maxbook)
+		//console.error(nums[0],"exceed maxbook",pat.maxbook)
 		return 0;
 	}
 	return 1;
@@ -42,7 +56,7 @@ var makeKPos=function(nums,pat){
 	var i,mul=1, kpos=0;
 	for (i=0;i<nums.length;i++) {
 		if (nums[i]<0) {
-			console.error("negative value",nums[i],nums);
+			log("error","makeKPos:","negative value",nums[i],JSON.stringify(nums));
 			return -1;
 		}
 	}
@@ -64,7 +78,7 @@ var makeKPos=function(nums,pat){
 	kpos+= nums[0]*mul;
 
 	if (checknumerror) {
-		console.error("kpos trimmed",stringifyKPos(kpos,pat),nums);
+		log("error","kpos trimmed",stringifyKPos(kpos,pat),JSON.stringify(nums));
 	}
 
 	return kpos;
@@ -205,7 +219,7 @@ const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
 
 	var end=makeKPos(arr,pat);
 	if (end<start) {
-		console.error("end bigger than start",arr);
+		log("error","end bigger than start",JSON.stringify(arr));
 		return start+1;
 	}
 	return end;
@@ -251,4 +265,5 @@ const bookStartPos=function(kpos,pat){
 	return makeKPos(arr,pat);
 }
 module.exports={parse:parse,buildAddressPattern:buildAddressPattern,makeKPos:makeKPos,isRange:isRange,
-	makeRange:makeRange,breakRange:breakRange,unpack:unpack,stringify:stringify,bookStartPos:bookStartPos};
+	makeRange:makeRange,breakRange:breakRange,unpack:unpack,stringify:stringify,
+	bookStartPos:bookStartPos,setLog:setLog};

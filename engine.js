@@ -103,7 +103,7 @@ const _open=function(id,opts,cb){
 	opening=id;
 	opts=opts||{};
 
-	if (typeof fn=="string") {
+	if (typeof fn=="string" && fn.substr(0,5)!=="blob:") {
 		if (fn.indexOf(".cor")==-1) fn+=".cor";
 
 		if ((typeof window!=="undefined" && window.node_modules)||isNode()) {
@@ -116,8 +116,12 @@ const _open=function(id,opts,cb){
 		opening=id;
 	} else {
 		//input type File
-		id=fn.name.replace(/\..+$/,"");
-		opening=id;
+		if (fn.name) {
+			id=fn.name.replace(/\..+$/,"");
+			opening=id;			
+		} else {
+			opening=fn.substr(fn.lastIndexOf("/")+1);
+		}
 	}
 
 	new CorpusROM.open(fn,function(err,kdb){
