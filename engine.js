@@ -1,7 +1,7 @@
 /* Corpus Engine 
    provide core interface to make use of ksana corpus
 */
-const JsonRom=require("ksana-jsonrom");
+const CorpusROM=require("ksana-corpus-rom");
 const Corpus=require("./corpus");
 
 var opening="";
@@ -99,27 +99,39 @@ const _open=function(id,opts,cb){
 	}
 
 	var fn=id,fn2;
-	if (fn.indexOf(".cor")==-1) fn+=".cor";
 
 	opening=id;
 	opts=opts||{};
-	if ((typeof window!=="undefined" && window.node_modules)||isNode()) {
-		fn2="../"+id+"-corpus/"+fn; //for nw
+
+	if (typeof fn=="string") {
+		if (fn.indexOf(".cor")==-1) fn+=".cor";
+
+		if ((typeof window!=="undefined" && window.node_modules)||isNode()) {
+			fn2="../"+id+"-corpus/"+fn; //for nw
+		} else {
+			const ofn=fn;
+			fn=id+"-corpus/"+fn;
+			fn2=ofn;//web mode try xxx-corpus first, to avoid http warning message
+		}		
+		opening=id;
 	} else {
-		const ofn=fn;
-		fn=id+"-corpus/"+fn;
-		fn2=ofn;//web mode try xxx-corpus first, to avoid http warning message
+		//input type File
+		id=fn.name.replace(/\..+$/,"");
+		opening=id;
 	}
-	new JsonRom.open(fn,function(err,kdb){
+
+	new CorpusROM.open(fn,function(err,kdb){
 		if (err) {
-			new JsonRom.open(fn2,function(err2,kdb2){
-				if (err2) {
-					opening="";
-					cb&&cb(err2);
-				} else {
-					prepareEngine(id,kdb2,opts,cb)
-				}
-			})
+			if (typeof fn2=="string") {
+				new CorpusROM.open(fn2,function(err2,kdb2){
+					if (err2) {
+						opening="";
+						cb&&cb(err2);
+					} else {
+						prepareEngine(id,kdb2,opts,cb)
+					}
+				})				
+			}
 		} else {
 			prepareEngine(id,kdb,opts,cb)
 		}
