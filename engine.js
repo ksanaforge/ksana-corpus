@@ -76,6 +76,13 @@ const open=function(id,opts,cb){
 		opts={};
 	}
 	var timer=0;
+
+	var engine=pool[id];
+	if (engine) {
+		cb&&cb(0,engine);
+		return engine;
+	}
+
 	if (opening) {
 		timer=setInterval(function(){
 			if (!opening) {

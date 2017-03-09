@@ -81,7 +81,7 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 		var at=bsearch(line2tpos,tposs[i],true);
 		if (line2tpos[at]>tposs[i]) at--;
 
-		const endlinetpos=line2tpos[at+1];
+		var endlinetpos=line2tpos[at+1];
 		while (at>0&&line2tpos[at-1]==line2tpos[at]) { //empty line has same tpos, backward to last line
 			at--;
 		}
