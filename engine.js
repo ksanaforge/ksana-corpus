@@ -109,17 +109,19 @@ const _open=function(id,opts,cb){
 
 	opening=id;
 	opts=opts||{};
-
+	const chromeextension=window && window.location.protocol=="chrome-extension:";
 	if (typeof fn=="string" && fn.substr(0,5)!=="blob:") {
-		if (fn.indexOf(".cor")==-1) fn+=".cor";
 
-		if ((typeof window!=="undefined" && window.node_modules)||isNode()) {
-			fn2="../"+id+"-corpus/"+fn; //for nw
-		} else {
-			const ofn=fn;
-			fn=id+"-corpus/"+fn;
-			fn2=ofn;//web mode try xxx-corpus first, to avoid http warning message
-		}		
+		if (fn.indexOf(".cor")==-1) fn+=".cor";
+		if (!chromeextension) {
+			if ((typeof window!=="undefined" && window.node_modules)||isNode()) {
+				fn2="../"+id+"-corpus/"+fn; //for nw
+			} else {
+				const ofn=fn;
+				fn=id+"-corpus/"+fn;
+				fn2=ofn;//web mode try xxx-corpus first, to avoid http warning message
+			}			
+		}
 		opening=id;
 	} else {
 		//input type File
