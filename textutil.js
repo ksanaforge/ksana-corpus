@@ -42,51 +42,57 @@ const trimLeft=function(str,chcount) {
 	}
 	return str.substr(dis);
 }
-const layoutText=function(text,startkpos,breaks){
-		var page=0,prevpage=0,lines=[],linetext="";
-		var linebreaks=[],pagebreaks=[],kpos=startkpos,nbreak=0;
-		var nextkpos;//kpos of next line start
-		
-		for (var i=0;i<text.length;i++) {
-			nextkpos=advanceLineChar.call(this,startkpos,i+1);
-			page=this.pageOf(kpos)-1;
-			if (prevpage!==page) {
-				while (lines.length>0&&!lines[lines.length-1].trim()) { 
-					linebreaks.pop();
-					lines.pop(); //remove extra tailing blank lines
-				}
-				pagebreaks.push(kpos); //show page break on screen
+//linetpos: tpos of input text
+//output linetpos, only works for no breaks, 
+const layoutText=function(text,startkpos,breaks,linetpos){
+	var page=0,prevpage=0,lines=[],linetext="",ltpos=[];
+	var linebreaks=[],pagebreaks=[],kpos=startkpos,nbreak=0;
+	var nextkpos;//kpos of next line start
+	
+	for (var i=0;i<text.length;i++) {
+		nextkpos=advanceLineChar.call(this,startkpos,i+1);
+		page=this.pageOf(kpos)-1;
+		if (prevpage!==page) {
+			while (lines.length>0&&!lines[lines.length-1].trim()) { 
+				linebreaks.pop();
+				lines.pop(); //remove extra tailing blank lines
+				ltpos.length&&ltpos.pop();
 			}
-			if (breaks) {
-				var breakcount=0,t=text[i],consumed=0;
-				//one text line might consist more than one p
-				while (nbreak<breaks.length&&nextkpos>breaks[nbreak]) {
-					breakcount++;
-					const leftpart=trimRight.call(this,text[i],breaks[nbreak]-kpos,true);
-					lines.push(linetext+leftpart.substr(consumed));
-					consumed=leftpart.length;
-					linetext="";
-					nbreak++;
-				} 
-				
-				if (!breakcount) {
-					linetext+=text[i];
-				} else {
-					linetext=text[i].substr(consumed);//remaining
-				}
-			} else {
-				lines.push(text[i].replace(/\r?\n/g," "));
-				linebreaks.push(kpos);				
-			}
-			prevpage=page;
-			kpos=nextkpos;
+			pagebreaks.push(kpos); //show page break on screen
 		}
 		if (breaks) {
-			linebreaks=breaks;
-			linebreaks.unshift(startkpos);
-			lines.push(linetext);
+			var breakcount=0,t=text[i],consumed=0;
+			//one text line might consist more than one p
+			while (nbreak<breaks.length&&nextkpos>breaks[nbreak]) {
+				breakcount++;
+				const leftpart=trimRight.call(this,text[i],breaks[nbreak]-kpos,true);
+				lines.push(linetext+leftpart.substr(consumed));
+				consumed=leftpart.length;
+				linetext="";
+				nbreak++;
+			} 
+			
+			if (!breakcount) {
+				linetext+=text[i];
+			} else {
+				linetext=text[i].substr(consumed);//remaining
+			}
+		} else {
+			lines.push(text[i].replace(/\r?\n/g," "));
+			linetpos&&ltpos.push(linetpos[i]);
+			linebreaks.push(kpos);				
 		}
-		return {linebreaks:linebreaks,pagebreaks:pagebreaks,lines:lines};
+		prevpage=page;
+		kpos=nextkpos;
+	}
+	if (breaks) {
+		linebreaks=breaks;
+		linebreaks.unshift(startkpos);
+		lines.push(linetext);
+	}
+
+	linetpos&&ltpos.push(linetpos[linetpos.length-1]);//termintor
+	return {linebreaks:linebreaks,pagebreaks:pagebreaks,lines:lines,linetpos:ltpos};
 }
 const extractKPos=function(text){
 	var out={},pat=this.addressPattern,articleOf=this.articleOf.bind(this);

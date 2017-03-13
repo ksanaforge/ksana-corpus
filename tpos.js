@@ -79,12 +79,17 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 			throw "cannot get bookline2tpos of book"+bookof[i];
 		}
 		var at=bsearch(line2tpos,tposs[i],true);
+
 		if (line2tpos[at]>tposs[i]) at--;
 
 		var endlinetpos=line2tpos[at+1];
-		while (at>0&&line2tpos[at-1]==line2tpos[at]) { //empty line has same tpos, backward to last line
+		/*
+		//2017.3.13 causing render hit problem
+		//empty line has same tpos, backward to last line
+		while (at>0&&line2tpos[at-1]==line2tpos[at]) { 
 			at--;
 		}
+		*/
 		if (at<0) continue;
 
 		line2tpos_at.push([line2tpos,at]);
@@ -114,10 +119,9 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 				endlinekpos=e.kpos;
 				var ltposs=[];
 				for (var j=s.at;j<=e.at;j++) {
-					if (j>s.at&&line2tpos[j]==line2tpos[j-1]) continue;
 					ltposs.push(line2tpos[j]);
 				}
-				ltposs.push(line2tpos[e.at+1]-1); //for triming posting list
+				ltposs.push(line2tpos[e.at+1]); //for triming posting list
 				linetpos.push(ltposs);
 			}
 			const end=endlinekpos+this.addressPattern.maxchar-1;

@@ -108,11 +108,12 @@ var cjk_next=function(t,adv){
 					code=t.charCodeAt(i);
 				} 
 			} else {
+				if (isWestern(code)) r++;
 				while (i<t.length && !isDelimiter(code) && !isCJK(code)) {
 					i++;
 					code=t.charCodeAt(i);
 				}				
-				r++;
+				
 			}
 		}
 	}
@@ -144,6 +145,7 @@ var cjk=function(t){
 					code=t.charCodeAt(i);
 				} 
 			} else {
+				if (isWestern(code)) r++;
 				while (i<t.length && !isDelimiter(code)&& !isCJK(code)) {
 					i++;
 					code=t.charCodeAt(i);
