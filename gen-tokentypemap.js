@@ -24,6 +24,7 @@ const ranges=[
 	[[0x41,0x5a],TokenTypes.LATIN,"latin capital"],
 	[[0x61,0x7a],TokenTypes.LATIN,"latin small"],
 	[[0x1e00,0x1eff],TokenTypes.LATIN,"latin extented additional"],
+	[[0xf1,0xd1],TokenTypes.LATIN,"n~"], //first bigger than second , not a range
 	[[0x100,0x17f],TokenTypes.LATIN,"latin extented"],
 	[[0x3000],TokenTypes.SPACE,"full width space"],
 	[[0xF40,0xFFF],TokenTypes.TIBETAN,"tibetan"],
@@ -38,7 +39,7 @@ for (i=0;i<65536;i++) types[i]= TokenTypes.SPACE;
 for (i=0;i<ranges.length;i++){
 	var r=ranges[i][0], type=ranges[i][1];
 	
-	if (r.length===2) { //start and end
+	if (r.length===2 && r[1]>r[0]) { //start and end
 		for (j=r[0];j<=r[1];j++) types[j]=type;
 	} else {
 		for (j=0;j<r.length;j++) 	types[r[j]]=type;
