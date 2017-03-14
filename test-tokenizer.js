@@ -9,6 +9,21 @@ var e;
 
 e=tokenizer.tokenize("༼ཁ༽ ༄༅། ༈ །འདུལ་བ་ལུང་བཞུགས་སོ། །律師戒行經第二部")
 
+e=tokenizer.tokenize("\n");
+assert.equal(e.length,1,JSON.stringify(e))
+
+
+e=tokenizer.tokenize("abc\nefg");
+assert.equal(e.length,3,JSON.stringify(e))
+
+e=tokenizer.tokenize("abc \nefg");
+assert.equal(e.length,4,JSON.stringify(e))
+
+e=tokenizer.tokenize("abc\n efg");
+assert.equal(e.length,4,JSON.stringify(e))
+
+e=tokenizer.tokenize("abc \n efg");
+assert.equal(e.length,5,JSON.stringify(e))
 
 e=tokenizer.tokenize("abc efg");
 assert.equal(e.length,3,JSON.stringify(e))

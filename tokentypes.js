@@ -1,5 +1,6 @@
 const TokenTypes={//cannot use number, for RLE encoding
 	SPACE:' ',
+	LINEBREAK:'B',
 	SURROGATE:'S',
 	CJK:'C',
 	NUMBER:'N',

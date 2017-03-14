@@ -19,12 +19,16 @@ each token
 */
 
 
-const tokenize=function(s){
+const tokenize=function(s){ //only accept \n
 	const c2tt=this.code2TokenType;
 
 	var i=0,out=[],tk,unknown=false;
 	while (i<s.length) {
 		tk="";
+		if (s[i]=="\n") { //own token for linebreak
+			out.push([s[i],i,TokenTypes.SPACE]);
+			i++;
+		}
 		var type=c2tt[s.charCodeAt(i)];
 		if (type==TokenTypes.SURROGATE) {
 			tk=s.substr(i,2);
@@ -67,9 +71,9 @@ const tokenize=function(s){
 				i++;
 				var code=s.charCodeAt(i);
 				var type=c2tt[code];
-				if (type!==TokenTypes.SPACE) break;
+				if (type!==TokenTypes.SPACE || s[i]=="\n") break;
 			}
-			out.push([tk,start,type]);
+			if (tk) out.push([tk,start,type]);
 		}
 	}
 	return out;
@@ -80,4 +84,16 @@ const createTokenizer=function(version){
 	return {tokenize:tokenize, TokenTypes:TokenTypes , version:version, code2TokenType:code2TokenType};
 }
 
-module.exports={createTokenizer:createTokenizer,parseIDS:parseIDS,latest:1};
+const concreteToken={};
+
+concreteToken[TokenTypes.SURROGATE]=true;
+concreteToken[TokenTypes.CJK]=true;
+concreteToken[TokenTypes.NUMBER]=true;
+concreteToken[TokenTypes.TIBETAN]=true;
+concreteToken[TokenTypes.LATIN]=true;
+concreteToken[TokenTypes.IDC]=true;
+
+
+module.exports={createTokenizer:createTokenizer,parseIDS:parseIDS,latest:2
+	,concreteToken:concreteToken
+,};
