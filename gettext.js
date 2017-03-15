@@ -46,7 +46,9 @@ const trimpages=function(kRange,pages,cb){
 		}
 		if (i==startpage) {
 			pg=pg.slice(startline);
-			pg[0]=textutil.trimLeft.call(this,pg[0],r.startarr[3],true);
+			if (r.startarr[3]) { // to prevent trimming leading punc
+				pg[0]=textutil.trimLeft.call(this,pg[0],r.startarr[3],false);
+			}
 		}
 		out=out.concat(pg);
 	}
