@@ -39,16 +39,19 @@ const trimpages=function(kRange,pages,cb){
 		const removePunc=!!this.get("meta").removePunc;
 
 		if (i==endpage) {//trim following
-			pg.length=r.endarr[2]+1;
-			pg[pg.length-1]=textutil.trimRight.call(this,pg[pg.length-1],r.endarr[3],removePunc);
+			if (r.endarr[2]+1<pg.length) {//pg has more lines
+				pg.length=r.endarr[2]+1;
+				pg[pg.length-1]=textutil.trimRight.call(this,pg[pg.length-1],r.endarr[3],removePunc);
+			}
 		}
 		if (i==startpage) {
 			pg=pg.slice(startline);
-			pg[0]=textutil.trimLeft.call(this,pg[0],r.startarr[3]);
+			pg[0]=textutil.trimLeft.call(this,pg[0],r.startarr[3],true);
 		}
 		out=out.concat(pg);
 	}
-
+	//remove extra lines
+	while (out.length && !out[out.length-1]) out.pop();
 	cb&&cb(out);
 	return out;
 }

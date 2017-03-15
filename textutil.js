@@ -9,46 +9,30 @@ const isPunc=function(c){
 const openbracket=function(s){
 	return s=='「'||s=='《'||s=='『'||s=='（'||s=='〔'||s=='【'||s=='〈';
 }
-const trimRight=function(str,chcount,includePunc) {
+const trimRight=function(str,chcount,tailing) {
 	if (!str) return "";
 	var c=chcount,dis=0,t,s=str,code;
-	
-	t=this.knext(s,c);
+	t=this.koffset(s,c,tailing);
 	dis+=t;
-	
-	s=s.substr(t);
-	code=s.charCodeAt(0);
-	if (includePunc && chcount) { //
-		while (isPunc.call(this,code) && !openbracket(s[0])) {
-			s=s.substr(1);
-			code=s.charCodeAt(0);
-			dis++;
-		}	
-	}
-	
 	return str.substr(0,dis);
 }
 
 
-const trimLeft=function(str,chcount) {
+const trimLeft=function(str,chcount,tailing) {
 	if (!str) return "";
 	var c=chcount,dis=0,t,s=str;
-	t=this.knext(s,c);
+	t=this.koffset(s,c,tailing);
 	dis+=t;
-	s=s.substr(t);
-	while (chcount&&(s.charCodeAt(0)<0x3400||s.charCodeAt(0)>0xdfff)){
-		s=s.substr(1);
-		dis++;
-	}
 	return str.substr(dis);
 }
+
 //linetpos: tpos of input text
 //output linetpos, only works for no breaks, 
 const layoutText=function(text,startkpos,breaks,linetpos){
 	var page=0,prevpage=0,lines=[],linetext="",ltpos=[];
 	var linebreaks=[],pagebreaks=[],kpos=startkpos,nbreak=0;
 	var nextkpos;//kpos of next line start
-	
+
 	for (var i=0;i<text.length;i++) {
 		nextkpos=advanceLineChar.call(this,startkpos,i+1);
 		page=this.pageOf(kpos)-1;

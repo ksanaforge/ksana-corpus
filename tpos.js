@@ -1,6 +1,7 @@
 /* Token Postion */
 const bsearch=require("./bsearch");
 const Ksanapos=require("./ksanapos");
+
 const TT=require("./tokentypes").TokenTypes;
 const prevline=function( kpos, line2tpos, at, adv){
 	var r=Ksanapos.unpack(kpos,this.addressPattern);
@@ -39,17 +40,7 @@ const nextline=function( kpos,line2tpos, at,adv ){
 const absline2kPos=function(bk,page_col_line,C,R) { //see inverted.js putLinePos
   return bk*R + page_col_line*C ;
 }	
-const calKCharOffset=function(tokencount,line,removePunc){
-	if (!tokencount) return 0;
-	const tokenized=this.tokenizer.tokenize(line);
-	var i=0;
-	while (i<tokenized.length && tokencount) {
-		tokencount-=twidth(tokenized[i][3],removePunc);
-		i++;
-	}
-	if (!tokenized[i]) return 0;
-	return this.kcount(line.substr(0,tokenized[i][2]));
-}
+
 const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof){
 	const C=Math.pow(2,this.addressPattern.charbits);
 	const R=Math.pow(2,this.addressPattern.rangebits);
@@ -76,20 +67,23 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 	for (var i=0;i<tposs.length;i++) {
 		const line2tpos=bookline2tpos[bookof[i]];
 		if (!line2tpos) {
-			throw "cannot get bookline2tpos of book"+bookof[i];
+			//debugger
+			//throw "cannot get bookline2tpos of book"+bookof[i];
+			continue;
 		}
 		var at=bsearch(line2tpos,tposs[i],true);
-
 		if (line2tpos[at]>tposs[i]) at--;
-
 		var endlinetpos=line2tpos[at+1];
-		/*
+
 		//2017.3.13 causing render hit problem
-		//empty line has same tpos, backward to last line
-		while (at>0&&line2tpos[at-1]==line2tpos[at]) { 
-			at--;
+		var nextlinekpos=absline2kPos(bookof[i],at+1,C,R);
+		if (this.lineOf(nextlinekpos)==0) {
+			//empty line has same tpos, backward to last line
+			while (at>0&&line2tpos[at-1]==line2tpos[at]) { 
+				at--;
+			}
 		}
-		*/
+
 		if (at<0) continue;
 
 		line2tpos_at.push([line2tpos,at]);
@@ -97,7 +91,7 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 		if (linetext) { //given texts, calculate accurate char offset
 			const tchar=tposs[i]- line2tpos[at];
 			const line=((linetext instanceof Array)?getLine(tposs[i],line2tpos):linetext ) ||"";
-			kpos+=calKCharOffset.call(this,tchar, line, removePunc);
+			kpos+=this.kskiptoken(line,tchar);
 		}
 		kposs.push(kpos);
 		linetpos.push([line2tpos[at],endlinetpos]);
@@ -181,6 +175,7 @@ const toTPos=function(kpos,cb){
 }
 const fromTPos=function(tpos,opts,cb){
 	var arr=tpos;
+
 	if (typeof opts=="function") {
 		cb=opts;
 		opts={};

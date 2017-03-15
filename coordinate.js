@@ -20,8 +20,7 @@ const getUnicodeCharDis=function(firstline,kpos,loglineKPos,getRawLine){
 	return chardis;
 }
 //convert kpos to codemirror line:ch
-const toLogicalPos=function(linebreaks,kpos,getRawLine,omitpunc,omitendingpunc) {
-	//if (kpos==25166339) debugger
+const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing) {
 	if (typeof kpos=="string") {
 		const k=textutil.parseRange.call(this,kpos);
 		kpos=k.start;
@@ -45,32 +44,32 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,omitpunc,omitendingpunc) 
 			dis-=l.length;
 		}
 	}
-	var ch=textutil.trimRight.call(this,l1,this.charOf(kpos),omitpunc).length;
+	var ch=textutil.trimRight.call(this,l1,this.charOf(kpos),tailing).length;
 	const paragraphfirstline=getRawLine(this.bookLineOf(loglineKPos)-firstline);
 	 
-	if (omitendingpunc) {
-		while (ch&&textutil.isPunc.call(this,l1.charCodeAt(ch-1))) ch--;
-	}
-	const prevcount=textutil.trimRight.call(this,paragraphfirstline,eoff,omitpunc).length;
+	const prevcount=eoff?textutil.trimRight.call(this,paragraphfirstline,eoff,tailing).length:0;
 
 	return {line:line,ch:ch+chardis-prevcount+extraspace};
 }
 const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical line
 	var krange=textutil.parseRange.call(this,address);
-	var start=toLogicalPos.call(this,linebreaks,krange.start,getRawLine,this.meta.removePunc,false);
-	var end=toLogicalPos.call(this,linebreaks,krange.end,getRawLine,this.meta.removePunc,true);
+	var start=toLogicalPos.call(this,linebreaks,krange.start,getRawLine,true);
+	var end=toLogicalPos.call(this,linebreaks,krange.end,getRawLine,false);
 	if (krange.start==krange.end) {
 		start=end;
 	}
-
+	if (end.line==start.line && end.ch<start.ch) {//cause by omitpunc
+		end.ch=start.ch;
+	}
 	return {start:start,end:end};
 }
 const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine,oneline){
 	const start=this.bookLineOf(startkpos)||0;
 	var line=getRawLine(start-firstline);
 	if (!line) return 1;
-	
-	var offset=textutil.trimRight.call(this,line,this.charOf(startkpos),true).length;
+
+	var offset=this.charOf(startkpos)?
+		textutil.trimRight.call(this,line,this.charOf(startkpos),true).length:0;
 	if ((line.length-offset)>=ch || oneline) { //ch is in this line
 		return startkpos+this.kcount(textline.substr(0,ch));
 	}
@@ -81,7 +80,7 @@ const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine,oneline
 		++now;
 		line=getRawLine(now-firstline);
 		if (typeof line=="undefined") {
-			console.error("raw line not found",now-firstline);
+			//console.error("raw line not found",now-firstline);
 			return startkpos;
 		}
 	}
