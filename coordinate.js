@@ -20,7 +20,7 @@ const getUnicodeCharDis=function(firstline,kpos,loglineKPos,getRawLine){
 	return chardis;
 }
 //convert kpos to codemirror line:ch
-const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing) {
+const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing,skipleading) {
 	if (typeof kpos=="string") {
 		const k=textutil.parseRange.call(this,kpos);
 		kpos=k.start;
@@ -41,13 +41,15 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing) {
 			extraspace+=this.tokenizer.isConcatable(l)?0:1;
 			n--;
 			l=getRawLine(n);
+			if (!l) break;
 			dis-=l.length;
 		}
 	}
 	var ch=textutil.trimRight.call(this,l1,this.charOf(kpos),tailing).length;
 	const paragraphfirstline=getRawLine(this.bookLineOf(loglineKPos)-firstline);
-	 
-	const prevcount=eoff?textutil.trimRight.call(this,paragraphfirstline,eoff,tailing).length:0;
+	//set skipleading to true if don't want to move to first concrete char
+	//suitable for kpos at the begining of line , yinshun def number
+	const prevcount=skipleading?textutil.trimRight.call(this,paragraphfirstline,eoff,tailing).length:0;
 
 	return {line:line,ch:ch+chardis-prevcount+extraspace};
 }

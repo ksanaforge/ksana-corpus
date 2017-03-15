@@ -62,6 +62,7 @@ const getOffset=function(tokenizer){
 		}
 
 		if (i<tokenized.length) return tokenized[i][1];
+		if (!tokenized[tokenized.length-1]) return 0;
 		return tokenized[tokenized.length-1][1]+tokenized[tokenized.length-1].length;
 	}
 }
