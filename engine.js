@@ -29,12 +29,7 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
 	}
 
 	opts.preload=opts.preload||[]; //user specified preload
-	var preload=[["meta"]
-	,["fields","article"]
-	,["fields","toc"],["fields","subtoc_range"]
-	,["fields","group"]
-	,["fields","a"]
-	];
+	var preload=[["meta"],["fields"]];
   if (!opts.textOnly) {
     preload.push(["inverted","book2tpos"]
     	,["inverted","article2tpos"]

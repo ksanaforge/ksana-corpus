@@ -1,7 +1,3 @@
-const getTOC=function(){
-	return this.getField("toc");
-}
-
 const getGroupTOC=function(group,cb){
 	group=parseInt(group)||0;
 	if (group<0){
@@ -11,16 +7,16 @@ const getGroupTOC=function(group,cb){
 	const r=this.groupKRange(group);
 	const articles=this.getField("article").value;
 
-	const subtoc_range=this.getField("subtoc_range");
-	if (!subtoc_range) {
+	const tocrange=this.getField("tocrange");
+	if (!tocrange) {
 		cb&&cb([]);
 		return;
 	}
-	var keys=[] ,subtoc_title=[];
-	for (var i=0;i<subtoc_range.value.length;i++) {
-		if (subtoc_range.pos[i]>=r[0] && r[1]>subtoc_range.pos[i]) {
-			subtoc_title.push("0\t"+articles[i]+"\t"+subtoc_range.pos[i].toString(36)); //see ksana-corpus-builder/subtree
-			keys.push(["fields","subtoc","value",i]);
+	var keys=[] ,toc_title=[];
+	for (var i=0;i<tocrange.value.length;i++) {
+		if (tocrange.pos[i]>=r[0] && r[1]>tocrange.pos[i]) {
+			toc_title.push("0\t"+articles[i]+"\t"+tocrange.pos[i].toString(36)); //see ksana-corpus-builder/subtree
+			keys.push(["fields","toc","value",i]);
 		}
 	}
 	
@@ -40,19 +36,19 @@ const getGroupTOC=function(group,cb){
 		cb(out);
 	}.bind(this))
 }
-const getSubTOC=function(kpos,cb){ //get toc containing kpos
-	const subtoc_range=this.getField("subtoc_range");
-	if (!subtoc_range) return [];
+const getTOC=function(kpos,cb){ //get toc containing kpos
+	const tocrange=this.getField("tocrange");
+	if (!tocrange) return [];
 	var keys=[],out=[],needfetch=false;
-	for (var i=0;i<subtoc_range.pos.length;i++) {
-		const start=subtoc_range.pos[i];
-		const end=subtoc_range.value[i];
+	for (var i=0;i<tocrange.pos.length;i++) {
+		const start=tocrange.pos[i];
+		const end=tocrange.value[i];
 		if (kpos>=start && kpos<end) {
-			if (this.cachedSubTOC[i]) {
-				out.push(this.cachedSubTOC[i]);
+			if (this.cachedTOC[i]) {
+				out.push(this.cachedTOC[i]);
 			} else {
 				needfetch=true;
-				keys.push( ["fields","subtoc","value",i] );				
+				keys.push( ["fields","toc","value",i] );				
 			}
 		}
 	}
@@ -62,10 +58,10 @@ const getSubTOC=function(kpos,cb){ //get toc containing kpos
 		return out;
 	} 
 	
-	const parseSubTOC=function(rawsubtoc){
+	const parseTOC=function(rawtoc){
 		var out=[];
-		for (var i=0;i<rawsubtoc.length;i++) {
-			const fields=rawsubtoc[i].split("\t");
+		for (var i=0;i<rawtoc.length;i++) {
+			const fields=rawtoc[i].split("\t");
 			out.push({d:parseInt(fields[0],10),
 								t:fields[1],
 								p:parseInt(fields[2],36)})
@@ -75,11 +71,11 @@ const getSubTOC=function(kpos,cb){ //get toc containing kpos
 
 	this.get(keys,{recursive:true},function(data){
 		for (var i=0;i<keys.length;i++){
-			const nsubtoc=keys[i][3];
-			this.cachedSubTOC[nsubtoc] = parseSubTOC(data[i]);
-			out.push(this.cachedSubTOC[nsubtoc]);
+			const ntoc=keys[i][3];
+			this.cachedTOC[ntoc] = parseTOC(data[i]);
+			out.push(this.cachedTOC[ntoc]);
 		}
 		cb(out);
 	}.bind(this));
 }
-module.exports={getTOC:getTOC,getSubTOC:getSubTOC,getGroupTOC:getGroupTOC};
+module.exports={getTOC:getTOC,getGroupTOC:getGroupTOC};
