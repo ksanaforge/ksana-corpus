@@ -73,7 +73,7 @@ const tokenize=function(s){ //only accept \n
 				var type=c2tt[code];
 				if (type!==TokenTypes.SPACE || s[i]=="\n") break;
 			}
-			if (tk) out.push([tk,start,type]);
+			if (tk) out.push([tk,start,TokenTypes.SPACE]);
 		}
 	}
 	return out;
@@ -81,7 +81,21 @@ const tokenize=function(s){ //only accept \n
 
 const createTokenizer=function(version){
 	const code2TokenType=tt.getCode2TokenTypeMap(version);
-	return {tokenize:tokenize, TokenTypes:TokenTypes , version:version, code2TokenType:code2TokenType};
+
+	const isConcatable=function(str){
+		if (!str)return true;
+		const type=code2TokenType[str.charCodeAt(0)];
+		return (type==TokenTypes.CJK||
+			type==TokenTypes.TIBETAN||
+			type==TokenTypes.IDC||
+			type==TokenTypes.PUNC||
+			type==TokenTypes.SPACE
+		);
+	}
+
+	return {tokenize:tokenize, TokenTypes:TokenTypes , 
+		version:version, code2TokenType:code2TokenType
+		, isConcatable:isConcatable};
 }
 
 const concreteToken={};

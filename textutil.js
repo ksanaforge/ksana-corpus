@@ -12,7 +12,7 @@ const openbracket=function(s){
 const trimRight=function(str,chcount,includePunc) {
 	if (!str) return "";
 	var c=chcount,dis=0,t,s=str,code;
-
+	
 	t=this.knext(s,c);
 	dis+=t;
 	
@@ -73,7 +73,8 @@ const layoutText=function(text,startkpos,breaks,linetpos){
 			} 
 			
 			if (!breakcount) {
-				linetext+=text[i];
+				const delimiter=this.tokenizer.isConcatable(text[i])?"":" ";
+				linetext+=delimiter+text[i];
 			} else {
 				linetext=text[i].substr(consumed);//remaining
 			}
