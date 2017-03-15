@@ -6,11 +6,8 @@ const getArticleTPos=function(at){
 	var start=0,end=0;
 	if (article2tpos && at>=0 && at<=article2tpos.length) {
 		start=article2tpos[at];
-		if (at>=article2tpos.length) {
-			end=this.meta.endtpos;
-		} else {
-			end=article2tpos[at+1];
-		}
+		end=article2tpos[at+1];
+		if (start && !end) end=this.meta.endtpos;
 	}
 	return {start:start,end:end};
 }
