@@ -1,4 +1,8 @@
-const getGroupTOC=function(group,cb){
+const overlap=function(tocstart,tocend,groupstart,groupend){
+	return !(tocstart>groupend || groupstart>tocend);
+}
+
+const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tree
 	group=parseInt(group)||0;
 	if (group<0){
 		cb&&cb([]);
@@ -14,7 +18,7 @@ const getGroupTOC=function(group,cb){
 	}
 	var keys=[] ,toc_title=[];
 	for (var i=0;i<tocrange.value.length;i++) {
-		if (tocrange.pos[i]>=r[0] && r[1]>tocrange.pos[i]) {
+		if (overlap(tocrange.pos[i],tocrange.value[i],r[0],r[1])) {
 			toc_title.push("0\t"+articles[i]+"\t"+tocrange.pos[i].toString(36)); //see ksana-corpus-builder/subtree
 			keys.push(["fields","toc","value",i]);
 		}
@@ -36,9 +40,14 @@ const getGroupTOC=function(group,cb){
 		cb(out);
 	}.bind(this))
 }
-const getTOC=function(kpos,cb){ //get toc containing kpos
+const getArticleTOC=function(article){
+
+}
+
+const getTOC=function(kpos,cb){ //get toc containing kpos,
 	const tocrange=this.getField("tocrange");
 	if (!tocrange) return [];
+
 	var keys=[],out=[],needfetch=false;
 	for (var i=0;i<tocrange.pos.length;i++) {
 		const start=tocrange.pos[i];
@@ -72,6 +81,7 @@ const getTOC=function(kpos,cb){ //get toc containing kpos
 	this.get(keys,{recursive:true},function(data){
 		for (var i=0;i<keys.length;i++){
 			const ntoc=keys[i][3];
+
 			this.cachedTOC[ntoc] = parseTOC(data[i]);
 			out.push(this.cachedTOC[ntoc]);
 		}

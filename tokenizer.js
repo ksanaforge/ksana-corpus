@@ -64,7 +64,7 @@ const tokenize=function(s){ //only accept \n
 			type=TokenTypes.SPACE;
 		}
 		if (type===TokenTypes.SPACE){
-			if (tk) out.push([tk,i,TokenTypes.SPACE]);
+			var start=i;
 			while (i<s.length) {
 				tk+=s.substr(i,1);
 				i++;
@@ -72,8 +72,9 @@ const tokenize=function(s){ //only accept \n
 				var type=c2tt[code];
 				if (type!==TokenTypes.SPACE || s[i]=="\n") break;
 			}
+			if (tk) out.push([tk,start,TokenTypes.SPACE]);
 		}
-	}
+	}	
 	return out;
 }
 
