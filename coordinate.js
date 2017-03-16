@@ -25,7 +25,6 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing,skipleading) {
 		const k=textutil.parseRange.call(this,kpos);
 		kpos=k.start;
 	}
-
 	const line=bsearch(linebreaks,kpos+1,true)-1;
 	const loglineKPos=linebreaks[line];//kPos of logical line
 	const eoff  =this.charOf(loglineKPos);
@@ -49,7 +48,11 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing,skipleading) {
 	const paragraphfirstline=getRawLine(this.bookLineOf(loglineKPos)-firstline);
 	//set skipleading to true if don't want to move to first concrete char
 	//suitable for kpos at the begining of line , yinshun def number
-	const prevcount=skipleading?textutil.trimRight.call(this,paragraphfirstline,eoff,tailing).length:0;
+	var prevcount=0;
+	//leading punc will increase prevcount for same line
+	if (this.bookLineOf(loglineKPos)-firstline<nrawline) {
+		prevcount=skipleading?textutil.trimRight.call(this,paragraphfirstline,eoff,tailing).length:0;
+	}
 
 	return {line:line,ch:ch+chardis-prevcount+extraspace};
 }

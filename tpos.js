@@ -37,10 +37,23 @@ const nextline=function( kpos,line2tpos, at,adv ){
 	const k=Ksanapos.makeKPos(r,this.addressPattern);
 	return {kpos:k, at:at};
 }
-const absline2kPos=function(bk,page_col_line,C,R) { //see inverted.js putLinePos
-  return bk*R + page_col_line*C ;
+const absline2kPos=function(bk,pageXline,C,R) { //see inverted.js putLinePos
+  return bk*R + pageXline*C ;
 }	
+//bsearch(line2tpos) might return line with no concrete token,
+//move up to line with concrete token.
+const closestConcreteLine=function(line2tpos,bk,at,C,R){
+	const lineOfnPage=at%this.addressPattern.maxline;
+	const lastLineInPage=at+(this.addressPattern.maxline-lineOfnPage)-1;
 
+	if (line2tpos[at]==line2tpos[lastLineInPage]) { //same tpos means it is empty
+		//move upward until meeting a line with concrete token
+		while (at>0&&line2tpos[at-1]==line2tpos[at]) { 
+			at--;
+		}
+	}
+	return at;
+}
 const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof){
 	const C=Math.pow(2,this.addressPattern.charbits);
 	const R=Math.pow(2,this.addressPattern.rangebits);
@@ -74,20 +87,15 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 		var at=bsearch(line2tpos,tposs[i],true);
 		if (line2tpos[at]>tposs[i]) at--;
 		var endlinetpos=line2tpos[at+1];
-
-		//2017.3.13 causing render hit problem
-		var nextlinekpos=absline2kPos(bookof[i],at+1,C,R);
-		if (this.lineOf(nextlinekpos)==0) {
-			//empty line has same tpos, backward to last line
-			while (at>0&&line2tpos[at-1]==line2tpos[at]) { 
-				at--;
-			}
-		}
+		//if (i==8)debugger
+		at=closestConcreteLine.call(this,line2tpos,bookof[i],at,C,R);
 
 		if (at<0) continue;
 
 		line2tpos_at.push([line2tpos,at]);
 		var kpos=absline2kPos(bookof[i],at,C,R);
+
+		
 		if (linetext) { //given texts, calculate accurate char offset
 			const tchar=tposs[i]- line2tpos[at];
 			const line=((linetext instanceof Array)?getLine(tposs[i],line2tpos):linetext ) ||"";
