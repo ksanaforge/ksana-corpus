@@ -23,7 +23,7 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
 	var engine={kdb:kdb};
 
 	engine.get=require("./get"); //install first API
-
+	engine.local=kdb.local;
 	if (kdb.fs.mergePostings) { //native mergePostings
 		engine.mergePostings=kdb.fs.mergePostings.bind(kdb.fs);
 	}
