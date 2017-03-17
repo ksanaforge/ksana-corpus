@@ -1,5 +1,8 @@
-const overlap=function(tocstart,tocend,groupstart,groupend){
-	return !(tocstart>=groupend || groupstart>=tocend);
+const isTocOfGroup=function(tocstart,tocend,groupstart,groupend){
+	console.log(tocstart,tocend,'g',groupstart,groupend)
+	return (tocstart>=groupstart && tocend<=groupend) //toc enclosed by group
+		|| (tocstart<groupstart && tocend>groupend) //toc fully enclose group
+
 }
 
 const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tree
@@ -18,7 +21,7 @@ const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tr
 	}
 	var keys=[] ,toc_title=[];
 	for (var i=0;i<tocrange.value.length;i++) {
-		if (overlap(tocrange.pos[i],tocrange.value[i],r[0],r[1])) {
+		if (isTocOfGroup(tocrange.pos[i],tocrange.value[i],r[0],r[1])) {
 			toc_title.push("0\t"+articles[i]+"\t"+tocrange.pos[i].toString(36)); //see ksana-corpus-builder/subtree
 			keys.push(["fields","toc","value",i]);
 		}
