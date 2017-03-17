@@ -24,16 +24,18 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
 
 	engine.get=require("./get"); //install first API
 	engine.local=kdb.local;
+	engine.expandVariant=opts.expandVariant||function(t){return t};
+
 	if (kdb.fs.mergePostings) { //native mergePostings
 		engine.mergePostings=kdb.fs.mergePostings.bind(kdb.fs);
 	}
 
 	opts.preload=opts.preload||[]; //user specified preload
 	var preload=[["meta"]
+	,["fields","tocrange"]
 	,["fields","article"]
 	,["fields","group"]
 	,["fields","a"]
-	,["fields","tocrange"]
 	];
   if (!opts.textOnly) {
     preload.push(["inverted","book2tpos"]
@@ -44,7 +46,6 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
     	);
   }	
 	opts.preload.forEach(function(p){preload.push(p)});
-
 	engine.get(preload,{recursive:true},function(res){
 		engine.meta=res[0];
 		if (!engine.meta.displayOptions) {
@@ -109,7 +110,7 @@ const _open=function(id,opts,cb){
 
 	opening=id;
 	opts=opts||{};
-	const chromeextension=window && window.location.protocol=="chrome-extension:";
+	const chromeextension=typeof window!=='undefined' && window.location.protocol=="chrome-extension:";
 	if (typeof fn=="string" && fn.substr(0,5)!=="blob:") {
 
 		if (fn.indexOf(".cor")==-1) fn+=".cor";
@@ -129,7 +130,12 @@ const _open=function(id,opts,cb){
 			id=fn.name.replace(/\..+$/,"");
 			opening=id;			
 		} else {
-			opening=fn.substr(fn.lastIndexOf("/")+1);
+			if (!fn.lastIndexOf) {
+				debugger;
+				opening=fn;
+			} else {
+				opening=fn.substr(fn.lastIndexOf("/")+1);
+			}
 		}
 	}
 

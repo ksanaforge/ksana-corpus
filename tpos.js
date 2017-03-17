@@ -81,14 +81,13 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 	for (var i=0;i<tposs.length;i++) {
 		const line2tpos=bookline2tpos[bookof[i]];
 		if (!line2tpos) {
-			//debugger
+			debugger
 			//throw "cannot get bookline2tpos of book"+bookof[i];
 			continue;
 		}
 		var at=bsearch(line2tpos,tposs[i],true);
 		if (line2tpos[at]>tposs[i]) at--;
 		var endlinetpos=line2tpos[at+1];
-		//if (i==8)debugger
 		at=closestConcreteLine.call(this,line2tpos,bookof[i],at,C,R);
 
 		if (at<0) continue;

@@ -1,7 +1,6 @@
 const isTocOfGroup=function(tocstart,tocend,groupstart,groupend){
 	return (tocstart>=groupstart && tocend<groupend) //toc enclosed by group
 		|| (tocstart<groupstart && tocend>groupend) //toc fully enclose group
-
 }
 
 const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tree
@@ -25,7 +24,7 @@ const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tr
 			keys.push(["fields","toc","value",i]);
 		}
 	}
-	
+	console.log(keys)
 	this.get(keys,function(res){
 		var out=[];
 		var groupname=this.groupNames()[group];
@@ -39,6 +38,7 @@ const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tr
 		for (var j=0;j<res.length;j++) {
 			out=out.concat(res[j]);
 		}
+		console.log(out.length)
 		cb(out);
 	}.bind(this))
 }
