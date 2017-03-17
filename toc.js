@@ -1,6 +1,6 @@
 const isTocOfGroup=function(tocstart,tocend,groupstart,groupend){
 	console.log(tocstart,tocend,'g',groupstart,groupend)
-	return (tocstart>=groupstart && tocend<=groupend) //toc enclosed by group
+	return (tocstart>=groupstart && tocend<groupend) //toc enclosed by group
 		|| (tocstart<groupstart && tocend>groupend) //toc fully enclose group
 
 }
