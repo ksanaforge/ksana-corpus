@@ -41,6 +41,7 @@ const absline2kPos=function(bk,pageXline,C,R) { //see inverted.js putLinePos
   return bk*R + pageXline*C ;
 }	
 //bsearch(line2tpos) might return line with no concrete token,
+// (in the empty area)
 //move up to line with concrete token.
 const closestConcreteLine=function(line2tpos,bk,at,C,R){
 	const lineOfnPage=at%this.addressPattern.maxline;

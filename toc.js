@@ -1,5 +1,5 @@
 const overlap=function(tocstart,tocend,groupstart,groupend){
-	return !(tocstart>groupend || groupstart>tocend);
+	return !(tocstart>=groupend || groupstart>=tocend);
 }
 
 const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tree
