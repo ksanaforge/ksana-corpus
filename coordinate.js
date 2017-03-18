@@ -20,11 +20,12 @@ const getUnicodeCharDis=function(firstline,kpos,loglineKPos,getRawLine){
 	return chardis;
 }
 //convert kpos to codemirror line:ch
-const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing,skipleading) {
+const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing,omitleadpunc) {
 	if (typeof kpos=="string") {
 		const k=textutil.parseRange.call(this,kpos);
 		kpos=k.start;
 	}
+
 	const line=bsearch(linebreaks,kpos+1,true)-1;
 	const loglineKPos=linebreaks[line];//kPos of logical line
 	const eoff  =this.charOf(loglineKPos);
@@ -46,38 +47,44 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing,skipleading) {
 	}
 	var ch=textutil.trimRight.call(this,l1,this.charOf(kpos),tailing).length;
 	const paragraphfirstline=getRawLine(this.bookLineOf(loglineKPos)-firstline);
-	//set skipleading to true if don't want to move to first concrete char
-	//suitable for kpos at the begining of line , yinshun def number
-	var prevcount=0;
-	//leading punc will increase prevcount for same line
-	if (this.bookLineOf(loglineKPos)-firstline<nrawline) {
-		prevcount=skipleading?textutil.trimRight.call(this,paragraphfirstline,eoff,tailing).length:0;
-	}
+
+	var prevcount=textutil.trimRight.call(this,paragraphfirstline,eoff).length;
 
 	return {line:line,ch:ch+chardis-prevcount+extraspace};
 }
 const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical line
 	var krange=textutil.parseRange.call(this,address);
-	var start=toLogicalPos.call(this,linebreaks,krange.start,getRawLine,true);
-	var end=toLogicalPos.call(this,linebreaks,krange.end,getRawLine,false);
-	if (krange.start==krange.end) {
-		start=end;
-	}
-	if (end.line==start.line && end.ch<start.ch) {//cause by omitpunc
-		end.ch=start.ch;
+	
+	var start=toLogicalPos.call(this,linebreaks,krange.start,getRawLine,true,true);
+	if (krange.end>krange.start){
+		var end=toLogicalPos.call(this,linebreaks,krange.end,getRawLine,false);
+		if (krange.start==krange.end) {
+			start=end;
+		}
+		if (end.line==start.line && end.ch<start.ch) {
+			end.ch=start.ch;
+		}		
+	} else {
+		end=start;
 	}
 	return {start:start,end:end};
 }
-const fromLogicalPos=function(textline,ch,startkpos,firstline,getRawLine,oneline){
+
+const fromLogicalPos=function(editorline,linech,startkpos,firstline,getRawLine,oneline){
 	const start=this.bookLineOf(startkpos)||0;
 	var line=getRawLine(start-firstline);
+	const ch=linech.ch;
 	if (!line) return 1;
 
+	//offset>0if breaking at middle of textline, 
 	var offset=this.charOf(startkpos)?
 		textutil.trimRight.call(this,line,this.charOf(startkpos),true).length:0;
+
 	if ((line.length-offset)>=ch || oneline) { //ch is in this line
-		return startkpos+this.kcount(textline.substr(0,ch));
+		const kpos=startkpos+this.kcount(editorline.substr(0,ch));
+		return kpos;
 	}
+
 	line=line.substr(offset);
 	var now=start;
 	while (ch>line.length) { //decrease ch with length of raw line

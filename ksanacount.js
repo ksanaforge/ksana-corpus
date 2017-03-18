@@ -48,8 +48,10 @@ const getOffset=function(tokenizer){
 		const tokenized=tokenizer.tokenize(str);
 		var i=0;
 
-		while (i<tokenized.length &&!concreteToken[tokenized[i][2]]) {
-			i++;
+		if (ntoken){
+			while (i<tokenized.length &&!concreteToken[tokenized[i][2]]) {
+				i++;
+			}
 		}
 
 		while (ntoken&&i<tokenized.length){
