@@ -90,6 +90,7 @@ const init=function(engine){
 	engine.cachedTOC=[];
 	engine.fromTPos=tpos.fromTPos;
 	engine.cachedPostings={};
+	engine.url=engine.kdb.url;
 }
 
 module.exports={init:init};
