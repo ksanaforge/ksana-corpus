@@ -43,6 +43,7 @@ const init=function(engine){
 	engine.getField=getfield.getField;
 	engine.getBookField=getfield.getBookField;
 	engine.getArticleField=getfield.getArticleField;
+	engine.getArticleFields=getfield.getArticleFields;
 	engine.trimField=getfield.trimField;
 	engine.getFieldNames=getfield.getFieldNames;
 	engine.findAField=getfield.findAField;

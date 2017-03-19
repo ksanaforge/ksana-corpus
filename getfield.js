@@ -34,6 +34,14 @@ const getArticleField=function(narticle,name,cb){
 	return this.get(keys,{recursive:true},cb);
 }
 
+const getArticleFields=function(narticle,cb){
+	var article=narticle;
+	if (typeof narticle=="number") {
+		article=this.getArticle(narticle);
+	}
+	return this.get(["afields",article.at],{recursive:true},cb);
+}
+
 const getFieldNames=function(cb){
 	const r=this.get(["fields"],function(data){return cb(Object.keys(data))});
 	return r?Object.keys(r):[];
@@ -79,5 +87,6 @@ const trimField=function(field,start,end){
 
 module.exports={getField:getField,getFields:getFields,
 	getBookFields:getBookFields,getBookField:getBookField,
-	getArticleField:getArticleField,getFieldNames:getFieldNames,
+	getArticleField:getArticleField,getArticleFields:getArticleFields,
+	getFieldNames:getFieldNames,
 findAField:findAField,trimField:trimField}

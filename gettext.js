@@ -130,7 +130,7 @@ const getArticleText=function(id_name,cb){
 	return getText.call(this,krange,cb);
 }
 
-const getArticleTextTag=function(id_name,fieldnames,cb){
+const getArticleTextTag=function(id_name,cb){
 	const article=this.getArticle(id_name);
 	if (!article) {
 		cb(null)
@@ -143,15 +143,7 @@ const getArticleTextTag=function(id_name,fieldnames,cb){
 			cb(null);
 			return null;
 		}
-		if (!fieldnames.length) {
-			cb({text:text});
-			return;
-		}
-		this.getArticleField(article.at,fieldnames,function(values){
-			var fields={};
-			values.forEach(function(v,idx){
-				fields[fieldnames[idx]]=v;
-			});
+		this.getArticleFields(article.at,function(fields){
 			cb({text:text,fields:fields});
 		});
 	}.bind(this));

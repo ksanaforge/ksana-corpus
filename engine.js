@@ -35,7 +35,7 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
 	,["fields","tocrange"]
 	,["fields","article"]
 	,["fields","group"]
-	,["fields","a"]
+	,["fields","anchor"]
 	];
   if (!opts.textOnly) {
     preload.push(["inverted","book2tpos"]

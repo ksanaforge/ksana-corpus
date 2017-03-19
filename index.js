@@ -1,6 +1,9 @@
 const Engine=require("./engine");
 const bsearch=require("./bsearch");
 const trimArticleField=require("./article").trimArticleField;
+const closeCorpus=function(id){
+	Engine.close(id);
+}
 const openCorpus=function(id,opts,readycb){
 	if (typeof opts=="function") {
 		readycb=opts;
@@ -21,6 +24,7 @@ const openCorpus=function(id,opts,readycb){
 		return Engine.open(id,opts,readycb);
 	}
 }
+
 const parseLink=require("./parselink");
 const textutil=require("./textutil");
 const Ksanapos=require("./ksanapos");
@@ -39,6 +43,7 @@ const stringifyRange=function(r,pat){
 	if (!pat)return "";
 	return Ksanapos.stringify(r,pat);
 }
-module.exports={openCorpus:openCorpus,bsearch:bsearch,parseLink:parseLink
+module.exports={openCorpus:openCorpus,closeCorpus:closeCorpus,
+	bsearch:bsearch,parseLink:parseLink
 ,trimArticleField:trimArticleField,parseRange:parseRange,stringifyRange:stringifyRange,
 knownPatterns:knownPatterns};

@@ -61,15 +61,15 @@ var get=function(path,opts,cb) {
 
 	if (typeof path[0] =="string") {
 		return engine.kdb.get(path,opts,function(data){
-			cb(data);//return top level keys
+			cb(data,engine,path);//return top level keys
 		});
 	} else if (typeof path[0] =="object") {
 		return gets.call(engine,path,opts,function(data){
-			cb(data);//return top level keys
+			cb(data,engine,path);//return top level keys
 		});
 	} else {
 		engine.kdb.get([],opts,function(data){
-			cb(data);//return top level keys
+			cb(data,engine);//return top level keys
 		});
 	}
 };	
