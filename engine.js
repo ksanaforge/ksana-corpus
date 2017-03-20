@@ -3,7 +3,7 @@
 */
 const CorpusROM=require("ksana-corpus-rom");
 const Corpus=require("./corpus");
-
+const regcor=require("./regcor");
 var opening="";
 var pool={};
 
@@ -52,6 +52,7 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
 			engine.meta.displayOptions={};
 		}
 		engine.id=id;
+		engine.registered=!!regcor[engine.id];
 		Corpus.init(engine);
 		cb(0,engine);
 	});
