@@ -31,12 +31,7 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
 	}
 
 	opts.preload=opts.preload||[]; //user specified preload
-	var preload=[["meta"]
-	,["fields","tocrange"]
-	,["fields","article"]
-	,["fields","group"]
-	,["fields","anchor"]
-	];
+	var preload=[["meta"],["gfields"],["fields","tocrange"]];
   if (!opts.textOnly) {
     preload.push(["inverted","book2tpos"]
     	,["inverted","article2tpos"]
@@ -45,8 +40,10 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
     	,["inverted","group2tpos"]
     	);
   }	
+  	console.time("preload")
 	opts.preload.forEach(function(p){preload.push(p)});
 	engine.get(preload,{recursive:true},function(res){
+		console.timeEnd("preload")
 		engine.meta=res[0];
 		if (!engine.meta.displayOptions) {
 			engine.meta.displayOptions={};

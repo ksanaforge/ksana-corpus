@@ -31,16 +31,19 @@ const isRange=function(range){
 	if (typeof range=="number"){
 		return Ksanapos.isRange(range,this.addressPattern);
 	} else {
-		return Ksanapos.isRange(Ksanapos.parse(range,pat),this.addressPattern);
+		return Ksanapos.isRange(Ksanapos.parse(range,this.addressPattern),this.addressPattern);
 	}
 }
-
+const linkingTo=function(fieldname,cor){
+	return fieldname.indexOf(getfield.BILINKSEP+cor.id)>0;
+}
 //get a juan and break by p
 const init=function(engine){
 	engine.addressPattern=Ksanapos.buildAddressPattern(engine.meta.bits,engine.meta.column);
 	engine.tokenizer=createTokenizer(engine.meta.versions.tokenizer);
 	engine.getArticle=article.getArticle;
 	engine.getField=getfield.getField;
+	engine.getGField=getfield.getGField;
 	engine.getBookField=getfield.getBookField;
 	engine.getArticleField=getfield.getArticleField;
 	engine.getArticleFields=getfield.getArticleFields;
@@ -91,6 +94,7 @@ const init=function(engine){
 	engine.fromTPos=tpos.fromTPos;
 	engine.cachedPostings={};
 	engine.url=engine.kdb.url;
+	engine.linkingTo=linkingTo;
 }
 
 module.exports={init:init};

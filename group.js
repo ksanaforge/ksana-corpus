@@ -1,11 +1,11 @@
 const bsearch=require("./bsearch");
 const groupNames=function(){
-	return this.get(["fields","group","value"])
-	||this.get(["fields","article","value"]);
+	return this.get(["gfields","group","value"])
+	||this.get(["gfields","article","value"]);
 }
 const groupKPoss=function(){
-	return this.get(["fields","group","pos"])||
-	this.get(["fields","article","pos"]);
+	return this.get(["gfields","group","pos"])||
+	this.get(["gfields","article","pos"]);
 }
 const groupTPoss=function(){
 	return this.get(["inverted","group2tpos"])||
@@ -43,8 +43,8 @@ const groupArticles=function(address){
 
 	const range=this.groupKRange.call(this,at);
 
-	const articlepos=this.get(["fields","article","pos"]);
-	const articlename=this.get(["fields","article","value"]);
+	const articlepos=this.get(["gfields","article","pos"]);
+	const articlename=this.get(["gfields","article","value"]);
 
 	var out=[];
 	for (var i=0;i<articlepos.length;i++) {

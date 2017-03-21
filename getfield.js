@@ -1,14 +1,17 @@
 const bsearch=require("./bsearch");
-
+const BILINKSEP="<";
 const getField=function(name,cb){
 	if (typeof name=="object") {
-		return getFields.call(this,name,cb);
+		return getFields.call(this,'fields',name,cb);
 	}
 	return this.get(["fields",name],{recursive:true},cb);
 }
 const getFields=function(names,cb){
-	const keys=names.map(function(name){return ["fields",name]});
+	const keys=names.map(function(name){return ['fields',name]});
 	return this.get(keys,{recursive:true},cb);	
+}
+const getGField=function(name,cb){
+	return this.get(["gfields",name],{recursive:true},cb);
 }
 const getBookField=function(name,book,cb){
 	if (typeof name=="object") {
@@ -38,8 +41,18 @@ const getArticleFields=function(narticle,cb){
 	if (typeof narticle=="number") {
 		article=this.getArticle(narticle);
 	}
-	
+	const fields=this.get("gfields");
+	var afields={};
+
+	for (var i in fields) {
+		if (i.indexOf(BILINKSEP)>0){
+			afields[i]=trimRangeField.call(this,fields[i],article.start,article.end);
+		}
+	}
 	return this.get(["afields",article.at],{recursive:true},function(data){
+		cb(Object.assign(afields,data));
+		//do not load any afields/article/field before this call
+		/*
 		const notloaded=[];
 		for (key in data) {
 			if (typeof data[key]=="string") {
@@ -53,6 +66,7 @@ const getArticleFields=function(narticle,cb){
 				cb(d)
 			});
 		}
+		*/
 	}.bind(this));
 }
 
@@ -99,8 +113,22 @@ const trimField=function(field,start,end){
 	return out;
 }
 
-module.exports={getField:getField,getFields:getFields,
+const trimRangeField=function(field,start,end){
+	var out={};
+
+	const ss=this.makeRange(start,start);
+	const ee=this.makeRange(end,end);
+	const s=bsearch(field.pos,ss+1,true);
+	const e=bsearch(field.pos,ee,true);
+
+	for (var key in field){
+		out[key]=field[key].slice(s,e);
+	}
+	return out;
+}
+
+module.exports={getField:getField,getFields:getFields,getGField:getGField,
 	getBookFields:getBookFields,getBookField:getBookField,
 	getArticleField:getArticleField,getArticleFields:getArticleFields,
-	getFieldNames:getFieldNames,
-findAField:findAField,trimField:trimField}
+	getFieldNames:getFieldNames,BILINKSEP:BILINKSEP,
+findAField:findAField,trimField:trimField,trimRangeField:trimRangeField}

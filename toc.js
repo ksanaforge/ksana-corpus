@@ -10,7 +10,7 @@ const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tr
 		return;
 	}
 	const r=this.groupKRange(group);
-	const articles=this.getField("article").value;
+	const articles=this.getGField("article").value;
 
 	const tocrange=this.getField("tocrange");
 	if (!tocrange) {

@@ -19,8 +19,8 @@ const articleOf=function(kRange_address){
 	}
 	const range=Ksanapos.breakRange(kRange,pat);
 
-	const articlepos=this.get(["fields","article","pos"]);
-	const articlename=this.get(["fields","article","value"]);
+	const articlepos=this.get(["gfields","article","pos"]);
+	const articlename=this.get(["gfields","article","value"]);
 	if (!articlepos) return null;
 
 	var at=bsearch(articlepos,range.start+1,true);
@@ -40,7 +40,7 @@ const articleOf=function(kRange_address){
 }
 
 const getArticleName=function(id){
-	const articlenames=this.get(["fields","article","value"]);
+	const articlenames=this.get(["gfields","article","value"]);
 	return articlenames[id];
 }
 
@@ -63,8 +63,8 @@ const adjustArticleRange=function(start,end){
 }
 
 const getArticle=function(at,nav) {
-	const articlepos=this.get(["fields","article","pos"]);
-	const articlename=this.get(["fields","article","value"]);
+	const articlepos=this.get(["gfields","article","pos"]);
+	const articlename=this.get(["gfields","article","value"]);
 	if (!articlepos) return null;
 
 	if (typeof id_name==="string") {
@@ -86,7 +86,7 @@ const getArticle=function(at,nav) {
 		,startH:this.stringify(r.start),end:r.end,endH:this.stringify(r.end) };
 }
 const articleCount=function(){
-	const articlename=this.get(["fields","article","value"]);
+	const articlename=this.get(["gfields","article","value"]);
 	return articlename.length;
 }
 
