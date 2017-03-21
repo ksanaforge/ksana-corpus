@@ -28,7 +28,6 @@ const getArticleField=function(narticle,name,cb){
 	}
 	var names=name;
 	if (typeof name=="string") names=[name]
-
 	const keys=names.map(function(n){return ["afields",article.at,n]});
 
 	return this.get(keys,{recursive:true},cb);
@@ -39,7 +38,22 @@ const getArticleFields=function(narticle,cb){
 	if (typeof narticle=="number") {
 		article=this.getArticle(narticle);
 	}
-	return this.get(["afields",article.at],{recursive:true},cb);
+	
+	return this.get(["afields",article.at],{recursive:true},function(data){
+		const notloaded=[];
+		for (key in data) {
+			if (typeof data[key]=="string") {
+				notloaded.push(["afields",article.at,key]);
+			}
+		}
+		if (notloaded.length==0) {
+			cb(data);	
+		} else {//work around
+			this.get(notloaded,{recursive:true},function(d){
+				cb(d)
+			});
+		}
+	}.bind(this));
 }
 
 const getFieldNames=function(cb){

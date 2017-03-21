@@ -1,9 +1,9 @@
 var gets=function(paths,opts,cb) { //get many data with one call
-
 	if (!paths) return ;
 	if (typeof paths=='string') {
 		paths=[paths];
 	}
+
 	var engine=this, output=[], taskqueue=[];
 	if (opts.syncable) opts.syncable=false;
 
@@ -33,7 +33,6 @@ var gets=function(paths,opts,cb) { //get many data with one call
 
 var get=function(path,opts,cb) {
 	var engine=this;
-
 	if (typeof opts=="function") {
 		context=cb;
 		cb=opts;

@@ -1,8 +1,11 @@
 const Ksanapos=require("./ksanapos");
 const P=Ksanapos.buildAddressPattern;
-
+const defaultPat=P([7,10,5,8]);
 var registered_corpus={
-	"default":P([7,10,5,8]),
+	"default":defaultPat,
+	"manual":defaultPat,
+	"demo":defaultPat,
+	"test":defaultPat,
 	"pts":P([7,10,6,6]),
 	"yinshun":P([7,11,5,6]),
 	"taisho":P([6,13,5,5],3),
