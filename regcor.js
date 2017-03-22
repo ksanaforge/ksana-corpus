@@ -9,7 +9,7 @@ var registered_corpus={
 	"yinshun":P([7,11,5,6]),
 	"taisho":P([6,13,5,5],3),
 	"nanchuan":P([7,10,4,6]),
-	"taixu":P([6,12,5,6]),
+	"taixu":P([5,12,6,6]),
 	"j13zs":P([4,13,4,6],4), //4 column per page
 	"mpps":P([1,12,6,8])
 }

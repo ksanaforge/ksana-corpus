@@ -40,10 +40,15 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
     	,["inverted","group2tpos"]
     	);
   }	
-  	console.time("preload")
+  	if(typeof window!=="undefined") {
+	  	console.log("loading "+id);
+	  	console.time("preload")  		
+  	}
 	opts.preload.forEach(function(p){preload.push(p)});
 	engine.get(preload,{recursive:true},function(res){
-		console.timeEnd("preload")
+  		if(typeof window!=="undefined") {
+			console.timeEnd("preload")
+		}
 		engine.meta=res[0];
 		if (!engine.meta.displayOptions) {
 			engine.meta.displayOptions={};
