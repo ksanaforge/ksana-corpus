@@ -17,9 +17,9 @@ const buildAddressPattern=function(b,column){
 	if (charbits*2+linebits*2+pagebits*2+bookbits>53) {
 		throw "address has more than 53 bits";
 	}
-	if (linebits>6 || charbits>8) {
+	if (linebits>8 || charbits>8) {
 		log("error",linebits,charbits)
-		throw "max line/char bits is 6 and 8";
+		throw "max line/char bits is 8 and 8";
 	}
 	const maxchar=1<<(charbits);
 	const maxline=1<<(linebits);
@@ -135,7 +135,13 @@ const stringifyKPos=function(kpos,pat){
 		s+=(parts[1]+1);
 		s+='.';
 	}
-	line='0'+(parts[2]+1);
+	if (pat.linebits>6) {
+		line='0'+(parts[2]+1).toString(16).toUpperCase();
+	} else {
+		line='0'+(parts[2]+1);	
+	}
+	
+
 	s+=line.substr(line.length-2);
 	if (pat.charbits>6) {
 		ch='0'+ (parts[3]).toString(16).toUpperCase();
@@ -182,17 +188,19 @@ const parseLineChar=function(arr,linech,remain,pat){
 		var base=10;
 		if (remain &&pat.charbits >6 ){
 			base=16;
+		} else if (pat.linebits>6){
+			base=16;
 		}
 		arr[remain?3:2]=parseInt(linech,base)- (remain?0:1) ;// if remain part, it is ch, otherwise line
 	} else {
-		arr[2]=parseInt(linech.substr(0,2),10)-1;  //first two is line
+		arr[2]=parseInt(linech.substr(0,2),pat.linebits>6?16:10)-1;  //first two is line
 		arr[3]=parseInt(linech.substr(2,2),pat.charbits>6?16:10); //ch is one or two byte
 	}
 }
 const regexFollow1=/(\d+)([a-d\.])([A-F\d]+)/
 const regexFollow2=/([a-d])([A-F\d]+)/
 const regexFollow3=/([A-F\d]+)/
-const parseRemain=function(remain,pat,arr){ //arr=[book,page,col,line,ch]
+const parseRemain=function(remain,pat,arr){ //arr=[book,page,line,ch]
 	var m=remain.match(regexFollow1);
 	var start=makeKPos(arr,pat);
 
