@@ -72,6 +72,7 @@ const init=function(engine){
 	engine.toLogicalPos=coordinate.toLogicalPos;
 	engine.fromLogicalPos=coordinate.fromLogicalPos;
 	engine.layoutText=textutil.layoutText;
+	engine.getParagraphBreaks=textutil.getParagraphBreaks;
 	engine.bookLineOf=textutil.bookLineOf;
 	engine.getTOC=TOC.getTOC;
 	engine.addressRegex=/@([\dpabcd]+-[\dabcd]+);?/g;

@@ -161,7 +161,21 @@ const pageStart=function(address){//return address of begining of page
 	arr[3]=0;
 	return Ksanapos.makeKPos(arr,pat);
 }
+const getParagraphBreaks=function(fields){
+	var out=[];
+
+	if (fields.head) {
+		const headpos=fields.head.pos.map(function(p){
+			const r=this.parseRange(p);
+			return r.start;
+		}.bind(this));
+		out=out.concat(headpos);
+	}
+	if (fields.p) out=out.concat(fields.p.pos);
+	out.sort();
+	return out;
+}
 module.exports={trimLeft:trimLeft,trimRight:trimRight,parseRange:parseRange,
 	bookOf:bookOf,pageOf:pageOf,lineOf:lineOf,charOf:charOf,pageStart:pageStart,
 	bookLineOf:bookLineOf,	layoutText:layoutText,isPunc:isPunc,
-	extractKPos:extractKPos,advanceLineChar:advanceLineChar};
+	extractKPos:extractKPos,advanceLineChar:advanceLineChar,getParagraphBreaks};
