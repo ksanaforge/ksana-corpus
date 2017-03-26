@@ -178,4 +178,4 @@ const getParagraphBreaks=function(fields){
 module.exports={trimLeft:trimLeft,trimRight:trimRight,parseRange:parseRange,
 	bookOf:bookOf,pageOf:pageOf,lineOf:lineOf,charOf:charOf,pageStart:pageStart,
 	bookLineOf:bookLineOf,	layoutText:layoutText,isPunc:isPunc,
-	extractKPos:extractKPos,advanceLineChar:advanceLineChar,getParagraphBreaks};
+	extractKPos:extractKPos,advanceLineChar:advanceLineChar,getParagraphBreaks:getParagraphBreaks};
