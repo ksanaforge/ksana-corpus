@@ -4,6 +4,9 @@
 const concreteToken=require("./tokenizer").concreteToken;
 const PUNC=require("./tokentypes").TokenTypes.PUNC;
 
+const openbracket=function(s){
+	return s=='「'||s=='《'||s=='『'||s=='（'||s=='〔'||s=='【'||s=='〈';
+}
 // return number of kpos unit in a string
 const getCount=function(tokenizer){
 	return function(str){
@@ -58,8 +61,8 @@ const getOffset=function(tokenizer){
 			if (concreteToken[tokenized[i][2]]) ntoken--;
 			i++;
 		}
-
-		while (tailing&&i<tokenized.length && !concreteToken[tokenized[i][2]]){
+		while (tailing&&i<tokenized.length && !concreteToken[tokenized[i][2]]
+			&&!openbracket(tokenized[i][0])){
 			i++;
 		}
 
