@@ -25,7 +25,7 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing,omitleadpunc) {
 		const k=textutil.parseRange.call(this,kpos);
 		kpos=k.start;
 	}
-
+	//if (kpos==33835008)debugger
 	const line=bsearch(linebreaks,kpos+1,true)-1;
 	const loglineKPos=linebreaks[line];//kPos of logical line
 	const eoff  =this.charOf(loglineKPos);
