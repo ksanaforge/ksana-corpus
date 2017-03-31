@@ -123,7 +123,7 @@ const _open=function(id,opts,cb){
 			} else {
 				const ofn=fn;
 				fn=id+"-corpus/"+fn;
-				fn2=ofn;//web mode try xxx-corpus first, to avoid http warning message
+				fn2=ofn;//web mode try xxx-corpus first, to avoid http warning message					
 			}			
 		}
 		opening=id;

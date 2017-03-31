@@ -73,7 +73,7 @@ const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical lin
 const fromLogicalPos=function(editorline,linech,startkpos,firstline,getRawLine,oneline){
 	const start=this.bookLineOf(startkpos)||0;
 	var line=getRawLine(start-firstline);
-	const ch=linech.ch;
+	var ch=linech.ch;
 	if (!line) return 1;
 
 	//offset>0if breaking at middle of textline, 
