@@ -40,13 +40,13 @@ const createEngine=function(id,kdb,opts,cb){//preload meta and other fields
     	,["inverted","group2tpos"]
     	);
   }	
-  	if(typeof window!=="undefined") {
+  	if(typeof console!=="undefined" && console.time) {
 	  	console.log("loading "+id);
 	  	console.time("preload")  		
   	}
 	opts.preload.forEach(function(p){preload.push(p)});
 	engine.get(preload,{recursive:true},function(res){
-  		if(typeof window!=="undefined") {
+  		if(typeof console!=="undefined" && console.time) {
 			console.timeEnd("preload")
 		}
 		engine.meta=res[0];
@@ -113,7 +113,8 @@ const _open=function(id,opts,cb){
 
 	opening=id;
 	opts=opts||{};
-	const chromeextension=typeof window!=='undefined' && window.location.protocol=="chrome-extension:";
+	const chromeextension=typeof window!=='undefined' && window.location &&
+	window.location.protocol=="chrome-extension:";
 	if (typeof fn=="string" && fn.substr(0,5)!=="blob:") {
 
 		if (fn.indexOf(".cor")==-1) fn+=".cor";
