@@ -13,7 +13,7 @@ var registered_corpus={
 	"j13zs":P([4,13,5,6],4), //4 column per page, 
 	                         //line should change to 4 after layout
 	"j13":P([4,9,5,6]), //開明書局版
-	"mpps":P([1,12,6,6]),
+	"mpps":P([2,12,6,6]),
 	"swjzz":P([4,9,4,6])
 }
 module.exports=registered_corpus;

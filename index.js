@@ -34,7 +34,7 @@ const parseRange=function(str,pat){
 		pat=regcor[pat];
 	}
 	if (!pat)return null;
-	return textutil.parseRange(krange,pat);
+	return textutil.parseRange(str,pat);
 }
 const stringifyRange=function(r,pat){
 	if (typeof pat=="string") {
