@@ -8,17 +8,19 @@ const prevline=function( kpos, line2tpos, at, adv){
 	while (adv) {
 		if (r[2]>0) {
 			r[2]--;
-			at--;
+			if (at>0) at--;
 		} else {
-			at--;
+			if (at>0) at--;
 			while (at>0&& line2tpos[at]==line2tpos[at-1]) at--;
 			const newline = at % this.addressPattern.maxline;
-			r[1]--;
+			if (r[1]>0) r[1]--;
 			r[2]=newline;
 		}
 		adv--;
 	}
+
 	const k=Ksanapos.makeKPos(r,this.addressPattern);
+
 	return {kpos:k,at:at};
 }
 /* TODO , check next line crossing a book */
@@ -115,7 +117,7 @@ const tPos2KPos=function(tposs,extraline,linetext,_linetpos,bookline2tpos,bookof
 			if (extraline>2) {
 				var adv=Math.floor((extraline-1)/2);
 				if (adv>2) adv=2;
-				const s=prevline.call(this,startlinekpos,line2tpos,at,adv );
+				var s=prevline.call(this,startlinekpos,line2tpos,at,adv );
 				const e=nextline.call(this,startlinekpos,line2tpos,at,adv );
 				startlinekpos=s.kpos;
 				endlinekpos=e.kpos;
