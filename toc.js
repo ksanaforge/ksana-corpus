@@ -1,6 +1,11 @@
-const isTocOfGroup=function(tocstart,tocend,groupstart,groupend){
-	return (tocstart>=groupstart && tocend<=groupend) //toc enclosed by group
+const isTocOfGroup=function(tocstart,tocend,groupstart,groupend,isLast){
+	const r=(tocstart>=groupstart && tocend<groupend) //toc enclosed by group
 		|| (tocstart<groupstart && tocend>groupend) //toc fully enclose group
+
+	if (!r && isLast) {
+		return (tocstart>=groupstart && tocend<=groupend);
+	}
+	return r;
 }
 
 const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tree
@@ -19,7 +24,8 @@ const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tr
 	}
 	var keys=[] ,toc_title=[];
 	for (var i=0;i<tocrange.value.length;i++) {
-		if (isTocOfGroup(tocrange.pos[i],tocrange.value[i],r[0],r[1])) {
+		const isLast=i==tocrange.value.length-1;
+		if (isTocOfGroup(tocrange.pos[i],tocrange.value[i],r[0],r[1],isLast)) {
 			toc_title.push("0\t"+articles[i]+"\t"+tocrange.pos[i].toString(36)); //see ksana-corpus-builder/subtree
 			keys.push(["fields","toc","value",i]);
 		}
