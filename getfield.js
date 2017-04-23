@@ -13,6 +13,9 @@ const getFields=function(names,cb){
 const getGField=function(name,cb){
 	return this.get(["gfields",name],{recursive:true},cb);
 }
+const getKeyField=function(name,cb){
+	return this.get(["kfields",name],{recursive:true},cb);
+}
 const getBookField=function(name,book,cb){
 	if (typeof name=="object") {
 		return getBookFields.call(this,name,book,cb);
@@ -128,6 +131,7 @@ const trimRangeField=function(field,start,end){
 }
 
 module.exports={getField:getField,getFields:getFields,getGField:getGField,
+	getKeyField:getKeyField,
 	getBookFields:getBookFields,getBookField:getBookField,
 	getArticleField:getArticleField,getArticleFields:getArticleFields,
 	getFieldNames:getFieldNames,BILINKSEP:BILINKSEP,

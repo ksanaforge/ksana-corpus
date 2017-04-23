@@ -10,6 +10,7 @@ const getfield=require("./getfield");
 const tpos=require("./tpos");
 const article=require("./article");
 const group=require("./group");
+const filterkey=require("./filterkey");
 const parseRange=function(krange){
 	return textutil.parseRange.call(this,krange,this.addressPattern);
 }
@@ -43,7 +44,9 @@ const init=function(engine){
 	engine.tokenizer=createTokenizer(engine.meta.versions.tokenizer);
 	engine.getArticle=article.getArticle;
 	engine.getField=getfield.getField;
-	engine.getGField=getfield.getGField;
+	engine.getGField=getfield.getGField;//oldname
+	engine.getGlobalField=getfield.getGField;
+	engine.getKeyField=getfield.getKeyField;
 	engine.getBookField=getfield.getBookField;
 	engine.getArticleField=getfield.getArticleField;
 	engine.getArticleFields=getfield.getArticleFields;
@@ -54,6 +57,7 @@ const init=function(engine){
 	engine.getText=gettext.getText;
 	engine.articleOf=article.articleOf;
 	engine.bookOf=textutil.bookOf;
+	engine.filterKey=filterkey;
 	engine.pageOf=textutil.pageOf;
 	engine.pageStart=textutil.pageStart;
 	engine.lineOf=textutil.lineOf;

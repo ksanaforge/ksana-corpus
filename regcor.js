@@ -15,6 +15,7 @@ var registered_corpus={
 	"j13":P([4,9,5,6]), //開明書局版
 	"mpps":P([2,12,6,6]),
 	"swjzz":P([4,9,4,6]),
-	"test":defaultPat
+	"test":defaultPat,
+	"fgdict":P([3,12,5,6],3),
 }
 module.exports=registered_corpus;
