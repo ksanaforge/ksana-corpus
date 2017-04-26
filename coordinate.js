@@ -53,6 +53,7 @@ const toLogicalPos=function(linebreaks,kpos,getRawLine,tailing,omitleadpunc) {
 	return {line:line,ch:ch+chardis-prevcount+extraspace};
 }
 const toLogicalRange=function(linebreaks,address,getRawLine){ //find logical line
+
 	var krange=textutil.parseRange.call(this,address);
 	
 	var start=toLogicalPos.call(this,linebreaks,krange.start,getRawLine,true,true);
