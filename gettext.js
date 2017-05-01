@@ -41,10 +41,8 @@ const trimpages=function(kRange,pages,cb){
 		if (i==endpage) {//trim following
 			if (r.endarr[2]+1<pg.length) {//pg has more lines
 				pg.length=r.endarr[2]+1;
-				pg[pg.length-1]=textutil.trimRight.call(this,pg[pg.length-1],r.endarr[3],removePunc);
-			} else if (pg.length){
-				pg[pg.length-1]=textutil.trimRight.call(this,pg[pg.length-1],r.endarr[3],removePunc);
 			}
+			pg[pg.length-1]=textutil.trimRight.call(this,pg[pg.length-1],r.endarr[3],removePunc);
 		}
 		if (i==startpage) {
 			pg=pg.slice(startline);
