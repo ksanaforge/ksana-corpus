@@ -17,6 +17,7 @@ var registered_corpus={
 	"swjzz":P([4,9,4,6]),
 	"test":defaultPat,
 	"fgdict":P([3,12,5,6],3),
-	"bhscjeq":defaultPat
+	"bhscjeq":defaultPat,
+	"yogacara":defaultPat
 }
 module.exports=registered_corpus;

@@ -51,6 +51,7 @@ const init=function(engine){
 	engine.getArticleField=getfield.getArticleField;
 	engine.getArticleFields=getfield.getArticleFields;
 	engine.trimField=getfield.trimField;
+	engine.trimRangeField=getfield.trimRangeField;
 	engine.getFieldNames=getfield.getFieldNames;
 	engine.findAField=getfield.findAField;
 	engine.getPages=gettext.getPages;
