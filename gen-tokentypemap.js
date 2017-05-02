@@ -24,7 +24,9 @@ const ranges=[
 	[[0x41,0x5a],TokenTypes.LATIN,"latin capital"],
 	[[0x61,0x7a],TokenTypes.LATIN,"latin small"],
 	[[0x1e00,0x1eff],TokenTypes.LATIN,"latin extented additional"],
-	[[0xf1,0xd1],TokenTypes.LATIN,"n~"], //first bigger than second , not a range
+	[[0xc0,0xd6],TokenTypes.LATIN,"latin"], 
+	[[0xd8,0xf6],TokenTypes.LATIN,"latin"], 
+	[[0xf8,0xff],TokenTypes.LATIN,"latin"], 
 	[[0x100,0x17f],TokenTypes.LATIN,"latin extented"],
 	[[0x3000],TokenTypes.SPACE,"full width space"],
 	[[0xF40,0xFFF],TokenTypes.TIBETAN,"tibetan"],
