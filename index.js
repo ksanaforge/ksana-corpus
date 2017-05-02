@@ -43,7 +43,9 @@ const stringifyRange=function(r,pat){
 	if (!pat)return "";
 	return Ksanapos.stringify(r,pat);
 }
+//https://github.com/motss/normalize-diacritics/
+const diacritics=require("./diacritics");
 module.exports={openCorpus:openCorpus,closeCorpus:closeCorpus,
-	bsearch:bsearch,parseLink:parseLink
+	bsearch:bsearch,parseLink:parseLink,diacritics
 ,trimArticleField:trimArticleField,parseRange:parseRange,stringifyRange:stringifyRange,
 regcor:regcor};
