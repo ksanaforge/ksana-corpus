@@ -46,6 +46,6 @@ const stringifyRange=function(r,pat){
 //https://github.com/motss/normalize-diacritics/
 const diacritics=require("./diacritics");
 module.exports={openCorpus:openCorpus,closeCorpus:closeCorpus,
-	bsearch:bsearch,parseLink:parseLink,diacritics
+	bsearch:bsearch,parseLink:parseLink,diacritics:diacritics
 ,trimArticleField:trimArticleField,parseRange:parseRange,stringifyRange:stringifyRange,
 regcor:regcor};
