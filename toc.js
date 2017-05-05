@@ -5,6 +5,10 @@ const isTocOfGroup=function(tocstart,tocend,groupstart,groupend,isLast){
 	if (!r && isLast) {
 		return (tocstart>=groupstart && tocend<=groupend);
 	}
+//for mpps
+	if (!r) {
+		return (tocstart>=groupstart && tocstart<groupend);
+	}
 	return r;
 }
 
