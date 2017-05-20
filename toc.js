@@ -15,7 +15,7 @@ const isTocOfGroup=function(tocstart,tocend,groupstart,groupend,isLast){
 // 因為前一卷的 tocrange 尾端可能在本卷第一個 <h0> 的結尾
 // 所以前一個 tocrange 會被認為落在本卷內.
 // 所以要找第二個標題, 當成本卷的開端, 前一個 tocrange 就不會被認為在本卷內了
-const getSecondToc=function(self,groupHead)
+const getSecondToc=function(self,groupHead,mycb)
 {
 	//var toc=self.getField("toc");
 	var tocrange=self.getField("tocrange");
@@ -38,7 +38,7 @@ const getSecondToc=function(self,groupHead)
 
 		mykeys.push(["fields","toc","value",firRange]);
 		mykeys.push(["fields","toc","value",firRange+1]);
-		var myTocPos = -1;
+		
 		self.get(mykeys,function(myres)
 		{
 			for(i=0;i<myres.length;i++)
@@ -52,22 +52,20 @@ const getSecondToc=function(self,groupHead)
 					if(find_count == 2)
 					{
 						// 找到了
-						myTocPos = toc_pos;
+						mycb(toc_pos);
 						return;
 					}
 				}
 			}
+			mycb(groupHead);
+			return;
 		});
 	}
 	else
 	{
-		return groupHead;	// 找不到就傳回原來的位置
+		mycb(groupHead);	// 找不到就傳回原來的位置
+		return;
 	}
-
-	if(myTocPos != -1) 
-		return myTocPos;
-	else 
-		return groupHead;
 }
 
 const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tree
@@ -84,31 +82,33 @@ const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tr
 		cb&&cb([]);
 		return;
 	}
-	var keys=[] ,toc_title=[];
-	var toc2th = getSecondToc(this,r[0]);	// 由卷首找出第二個目錄的位置
-	for (var i=0;i<tocrange.value.length;i++) {
-		const isLast=i==tocrange.value.length-1;
-		if (isTocOfGroup(tocrange.pos[i],tocrange.value[i],toc2th,r[1],isLast)) {
-			toc_title.push("0\t"+articles[i]+"\t"+tocrange.pos[i].toString(36)); //see ksana-corpus-builder/subtree
-			keys.push(["fields","toc","value",i]);
+	// 底下不得不改成 callback function
+	getSecondToc(this,r[0],function(toc2th){	// 由卷首找出第二個目錄的位置
+		var keys=[] ,toc_title=[];
+		for (var i=0;i<tocrange.value.length;i++) {
+			const isLast=i==tocrange.value.length-1;
+			if (isTocOfGroup(tocrange.pos[i],tocrange.value[i],toc2th,r[1],isLast)) {
+				toc_title.push("0\t"+articles[i]+"\t"+tocrange.pos[i].toString(36)); //see ksana-corpus-builder/subtree
+				keys.push(["fields","toc","value",i]);
+			}
 		}
-	}
-	console.log(keys)
-	this.get(keys,function(res){
-		var out=[];
-		var groupname=this.groupNames()[group];
-		if (!groupname) {
-			debugger;
-			groupname="";
-		}
+		console.log(keys)
+		this.get(keys,function(res){
+			var out=[];
+			var groupname=this.groupNames()[group];
+			if (!groupname) {
+				debugger;
+				groupname="";
+			}
 
-		groupname=groupname.substr(groupname.indexOf(";")+1);
-		out.push("0\t"+groupname+"\t"+r[0].toString(36));
-		for (var j=0;j<res.length;j++) {
-			out=out.concat(res[j]);
-		}
-		console.log(out.length)
-		cb(out);
+			groupname=groupname.substr(groupname.indexOf(";")+1);
+			out.push("0\t"+groupname+"\t"+r[0].toString(36));
+			for (var j=0;j<res.length;j++) {
+				out=out.concat(res[j]);
+			}
+			console.log(out.length)
+			cb(out);
+		}.bind(this))
 	}.bind(this))
 }
 const getArticleTOC=function(article){
