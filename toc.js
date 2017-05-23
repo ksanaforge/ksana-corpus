@@ -1,13 +1,21 @@
 const isTocOfGroup=function(tocstart,tocend,groupstart,groupend,isLast){
+	/*
 	const r=(tocstart>=groupstart && tocend<groupend) //toc enclosed by group
 		|| (tocstart<groupstart && tocend>groupend) //toc fully enclose group
 
 	if (!r && isLast) {
 		return (tocstart>=groupstart && tocend<=groupend);
 	}
+	*/
+	/*
 	if (!r) {
 		return ((tocstart>=groupstart && tocstart<groupend) || ((tocend>groupstart && tocend<=groupend)));
 	}
+	*/
+	const r=(tocstart<=groupstart && tocend>=groupend) //toc fully enclose group
+		|| (tocstart>=groupstart && tocstart<groupend) 
+		|| (tocend>groupstart && tocend<=groupend)
+
 	return r;
 }
 
@@ -15,7 +23,16 @@ const isTocOfGroup=function(tocstart,tocend,groupstart,groupend,isLast){
 // 因為前一卷的 tocrange 尾端可能在本卷第一個 <h0> 的結尾
 // 所以前一個 tocrange 會被認為落在本卷內.
 // 所以要找第二個標題, 當成本卷的開端, 前一個 tocrange 就不會被認為在本卷內了
-const getSecondToc=function(self,groupHead,mycb)
+
+/////////////////////////////////////////
+// 上面的方法不好, 因為可能沒有第二個標題... :(
+// 如果前一卷的 tocrange 尾端可能在本卷第一個 <h0> 的結尾
+// 此時前一卷 tocrange 的尾端會大於本卷 tocrange 的開頭
+// 則設定前一卷 tocrange 的尾端 = 本卷 tocrange 的開頭
+// if (tocrange[i-1].end > tocrange[i].head) tocrange[i-1].end = tocrange[i].head 
+// 如此一來, 只要找第一個標題, 當成本卷的開端即可.
+
+const getFirstToc=function(self,groupHead,groupTail,mycb)
 {
 	//var toc=self.getField("toc");
 	var tocrange=self.getField("tocrange");
@@ -32,12 +49,12 @@ const getSecondToc=function(self,groupHead,mycb)
 	
 	if(firRange != -1)	// 找到才處理
 	{
-		var find_count = 0;	// 找到的 head 數
 		var mykeys = [];
-		// 此 group 的第二個 head 可能落在 firRange 和下一個 Range 之間
+		// 此 group 的第一個 head 可能落在 firRange 和下一個 Range 之間
 
 		mykeys.push(["fields","toc","value",firRange]);
-		mykeys.push(["fields","toc","value",firRange+1]);
+		if(firRange < tocrange.value.length - 1)
+			mykeys.push(["fields","toc","value",firRange+1]);
 		
 		self.get(mykeys,function(myres)
 		{
@@ -48,8 +65,7 @@ const getSecondToc=function(self,groupHead,mycb)
 					var fields = myres[i][j].split("\t");
 					var toc_pos = parseInt(fields[2],36);
 
-					if(toc_pos >= groupHead) find_count++;
-					if(find_count == 2)
+					if(toc_pos >= groupHead && toc_pos < groupTail)
 					{
 						// 找到了
 						mycb(toc_pos);
@@ -83,11 +99,13 @@ const getGroupTOC=function(group,cb){// cut by group,not guarantee a complete tr
 		return;
 	}
 	// 底下不得不改成 callback function
-	getSecondToc(this,r[0],function(toc2th){	// 由卷首找出第二個目錄的位置
+	getFirstToc(this,r[0],r[1],function(toc1st){	// 由卷首找出第一個目錄的位置
 		var keys=[] ,toc_title=[];
 		for (var i=0;i<tocrange.value.length;i++) {
 			const isLast=i==tocrange.value.length-1;
-			if (isTocOfGroup(tocrange.pos[i],tocrange.value[i],toc2th,r[1],isLast)) {
+			var tocragne_end = tocrange.value[i];
+			if(!isLast && tocrange.value[i] > tocrange.pos[i+1]) tocragne_end = tocrange.pos[i+1];
+			if (isTocOfGroup(tocrange.pos[i],tocragne_end,toc1st,r[1],isLast)) {
 				toc_title.push("0\t"+articles[i]+"\t"+tocrange.pos[i].toString(36)); //see ksana-corpus-builder/subtree
 				keys.push(["fields","toc","value",i]);
 			}
