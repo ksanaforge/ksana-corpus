@@ -10,10 +10,10 @@ var gets=function(paths,opts,cb) { //get many data with one call
 	var makecb=function(path){
 		return function(data){
 				if (!(data && typeof data =='object' && data.__empty)) output.push(data);
-				//engine.get(path,opts,taskqueue.shift());
-				setTimeout(function (){
-					engine.get(path,opts,taskqueue.shift());
-			 	}, 0);
+				engine.get(path,opts,taskqueue.shift());
+				//setTimeout(function (){
+				//	engine.get(path,opts,taskqueue.shift());
+			 	//}, 0);
 		};
 	};
 
